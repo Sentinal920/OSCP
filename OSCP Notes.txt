@@ -853,6 +853,13 @@ Use thunderbird mail client to login
 	Open ThunderBird -> Add Email -> Login
 	
 	
+user kunal
+pass kunal@123
+LIST
+RETR 1
+RETR 2
+
+	
 ===========
 james (4555)
 ===========
