@@ -1,5 +1,7 @@
 PERSONAL OSCP NOTES ~Kunal Patel
 ==-==-==-==-==-==-==-==-==-==-==
+This notes consists of commands for tools and techniques i used to hack vulnerable machines from various platforms such as vulnhub, hackthebox, cyberseclabs, tryhackme, pwntilldawn, root-me, wizardlabs... while preparing for oscp.
+
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
 https://obsproject.com/ --> to capture the screen while exam
