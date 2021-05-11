@@ -3,7 +3,7 @@ PERSONAL OSCP NOTES ~Kunal Patel
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
 https://obsproject.com/ --> to capture the screen while exam
-
+Automate BOF: https://github.com/3isenHeiM/OSCP-BoF
 ====
 Nmap
 ====
