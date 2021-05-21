@@ -440,6 +440,15 @@ On Victim
 		Use nmap to scan in order to unlock (OPEN) ssh
 		for x in 571 290 911 22; do nmap -Pn --max-retries 0 -p $x 10.10.10.43; done
 If you do nmap scan in reverse order (22 911 290 571) It Locks the SSH port again
+		
+OR
+
+!/bin/bah
+ports=“1111 2222 3333”
+host=“10.10.10.43“
+for x in $ports;do nmap -Pn –host_timeout 201 –max-retries 0 -p $x $host sleep 1; done
+	
+	
 	
 ===========
 SMTP (25)
