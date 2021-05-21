@@ -5,7 +5,10 @@ This notes consists of commands for tools and techniques i used to hack vulnerab
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
 https://obsproject.com/ --> to capture the screen while exam
+
 Automate BOF: https://github.com/Sentinal920/Automating-BOF
+Automating the Buffer Overflows in Exam
+
 
 ====
 Nmap
