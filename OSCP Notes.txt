@@ -9,7 +9,9 @@ https://obsproject.com/ --> to capture the screen while exam
 Automate BOF: https://github.com/Sentinal920/Automating-BOF
 Automating the Buffer Overflows in Exam
 
-Some cool notes by a guy: https://github.com/areyou1or0/OSCP
+Some cool notes: 
+https://github.com/areyou1or0/OSCP
+https://configurationsapien.com/category/pentester/
 
 ====
 Nmap
