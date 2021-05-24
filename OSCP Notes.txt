@@ -794,6 +794,10 @@ Windows 7 SP1 x64
 =============
 Eternal blue
 =============
+
+Best worls with python3 on windwos xp 32 bit 64 bit, windows 7,8
+https://github.com/3ndG4me/AutoBlue-MS17-010
+
 nmap --script smb-check-vulns.nse -p445 192.168.206.136
 
 nmap -p 445 --script "vuln and safe" -Pn -n 10.10.10.178
