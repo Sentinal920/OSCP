@@ -250,6 +250,14 @@ nmap -p 139,445 10.11.1.115 -vv --script=smb-vuln-cve2009-3103.nse,smb-vuln-ms06
 
 SMB Verson checker: https://github.com/rewardone/OSCPRepo/blob/master/scripts/recon_enum/smbver.sh
 
+
+Another quick and dirty way to get smb version info:
+				   -----------------
+Run smbclient and capture the packets
+	smbclient -L //10.1.1.1
+	ngrep -i -d tun0 's.?a.?m.?b.?a.*[[:digit:]]'
+	
+	
 ===================== 
 SMB(Samba) enumeration
 ===================== 
