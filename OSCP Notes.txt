@@ -969,6 +969,9 @@ https://speakerdeck.com/knaps/escape-from-shellcatraz-breaking-out-of-restricted
 ================
 priv escalation
 ================
+Some cool privesc tools & scripts here: https://github.com/1N3/PrivEsc
+
+
 	Via kernel exploits
 	Exploiting services which are running as a root
 	Exploiting SUID Executables
