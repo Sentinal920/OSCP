@@ -333,9 +333,23 @@ Scan everything
 To list usernames 
 	enum4linux -U 10.10.10.182
 	
-====================================================
-NFS (Network File System) open mount vuln (port 111)
-====================================================
+============================================================
+NFS (Network File System) open mount vuln (port 111) RPCBIND
+============================================================
+
+nmap -sV -p 111 --script=rpcinfo 10.10.10.11
+nmap -p 111 --script nfs* 10.11.1.72
+
+If showmount has directory with specific UID, then you won't be able to open the file. In such case, create a user and change its UID
+
+sudo adduser kunal
+	Adding new group `kunal' (1001) ...
+	Adding new user `kunal' (1001) with group `kunal' ...
+	
+Now change the uid (1001) with the UID you need to open the specific file
+sudo sed -i -e 's/1001/1004/g' /etc/passwd
+
+
 showmount -e 192.168.6.154
 or
 showmount --exports 192.168.6.146
