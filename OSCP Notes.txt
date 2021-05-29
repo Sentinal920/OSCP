@@ -254,6 +254,9 @@ SMB is used------> Linux and WIndows both in server
 SMB CHECK FOR VULNERABILITY
 nmap -p 139,445 10.11.1.115 -vv --script=smb-vuln-cve2009-3103.nse,smb-vuln-ms06-025.nse,smb-vuln-ms07-029.nse,smb-vuln-ms08-067.nse,smb-vuln-ms10-054.nse,smb-vuln-ms10-061.nse,smb-vuln-ms17-010.nse
 
+nmap -v -p 139,445 --script=smb-vuln-* --script-args=unsafe=1 10.10.10.11
+(unsafe=1 will almost always crash a system, be carefull on production env)
+
 SMB Verson checker: https://github.com/rewardone/OSCPRepo/blob/master/scripts/recon_enum/smbver.sh
 
 
