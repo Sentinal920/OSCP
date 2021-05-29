@@ -379,10 +379,12 @@ to download files from victim machine to kali
 
 	meterpreter > download \openssh.gzip /root/Desktop/
 
-===========================
-SNMP Enumeration (PORT 161)
-===========================
+==============================
+SNMP Enumeration (UDP PORT 161)
+===============================
 snmp is common in windows machines
+
+sudo nmap -sU --open -p 161 10.11.1.1-254 -oG open-snmp.txt
 
 snmpwalk -c public -v2c 10.10.10.116
 snmpwalk -v 2c -c public 10.10.10.116
@@ -517,6 +519,7 @@ VRFY root
 nmap --script=smtp-commands,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 -p 25 10.11.1.111
 smtp-user-enum -M VRFY -U /root/sectools/SecLists/Usernames/Names/names.txt -t 10.11.1.111
 smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/Names/names.txt -t 10.200.200.188clear                                                        1 ⨯
+
 
 
 ==============
