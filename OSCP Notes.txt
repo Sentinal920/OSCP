@@ -5,7 +5,7 @@ This notes consists of commands for tools and techniques i used to hack vulnerab
 
 
 https://github.com/Elinpf/OSCP-survival-guide
-
+https://pentest.tonyng.net/timo-sablowskis-oscp-note/
 
 
 
