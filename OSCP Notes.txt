@@ -93,7 +93,7 @@ or gobuster
 			-c <http cookies>		Specify a cookie for simulating your auth
 			
 then nikto -h 192.168.6.141
-     nikto -host=http://www.megacorpone.com -maxtime=30s
+     nikto -host=http://www.megacorpone.com -maxtime=30s (Limits max time to scan to 30seconds)
 		- Nikto v2.1.6
 		---------------------------------------------------------------------------
 		+ Target IP: 38.100.193.76
