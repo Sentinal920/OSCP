@@ -39,6 +39,9 @@ UDP Scan     -sU
 FIN Scan     -sF        
 (-sF Finished Scan)- Used to send finished message to server so firewall would think
  you are already talking with the server and allows you in to finish your talking)
+ 
+Scan for Vulns
+sudo nmap --script vuln 10.11.1.10
 
 Scan whole network, 
 nmap -sn 10.10.10.1-254 | awk '/is up/ {print up}; {gsub (/\(|\)/,""); up = $NF}' > out.txt
