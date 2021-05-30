@@ -345,6 +345,10 @@ nmap -p 111 --script nfs* 10.11.1.72
 
 If showmount has directory with specific UID, then you won't be able to open the file. In such case, create a user and change its UID
 
+Check this TIP
+https://hack-tips.com/2020/02/21/how-to-find-nfs-mounted-drives-penetration-testing/
+
+
 sudo adduser kunal
 	Adding new group `kunal' (1001) ...
 	Adding new user `kunal' (1001) with group `kunal' ...
