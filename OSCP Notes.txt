@@ -369,6 +369,8 @@ In kali
 mkdir /tmp/shivaytmp
 mount -t nfs 192.168.6.146:/home/shivay /tmp/shivaytmp  (where -t means type)
 
+mount -t nfs -o vers=3 
+
 And now we can copy our reverse_shell to mounted nfs
 Copy reverse_shell.php to /tmp/shivaynfs
 
