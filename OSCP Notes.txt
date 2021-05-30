@@ -480,6 +480,14 @@ ssh (port 22)
 Login to ssh
 	ssh root@10.10.10.16
 
+
+Add your ssh public ket into victims authorized_keys
+	ssh-keygen
+go to generated ssh key and copy id_rsa.pub into  /home/VICITM/.ssh/authorized_keys 
+
+
+
+
 Login to ssh via private key
 	ssh -i id_rsa user@10.10.10.146
 	 (Also it might ask for passphrase, use ssh2john and crack it) 
