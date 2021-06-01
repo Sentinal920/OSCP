@@ -1516,6 +1516,10 @@ Windows privesc
 If you already have low priv shell and creds for high priv users use runas utility to login as high priv user in windows. (psexec can also be used)
 https://recipeforroot.com/runas/
 
+Windows privesc guide
+https://guif.re/windowseop
+
+
 -------------------------------
 (1: Windows-Exploit-Suggester)
 -------------------------------
