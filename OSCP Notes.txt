@@ -6,7 +6,7 @@ This notes consists of commands for tools and techniques i used to hack vulnerab
 
 https://github.com/Elinpf/OSCP-survival-guide
 https://pentest.tonyng.net/timo-sablowskis-oscp-note/
-
+https://cyb-3-rw-1-z4rd.gitbook.io/cyberbook/database
 
 
 Cyberchef --> website that allows decoding and encoding of various stuffs like ssh(RSA,cipher),jpg etc
