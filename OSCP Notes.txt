@@ -91,7 +91,7 @@ or gobuster
 			-U and -P				Username and Password for Basic Auth
 			-p <x>					Proxy to use for requests
 			-c <http cookies>		Specify a cookie for simulating your auth
-			
+			-k //DISABLE SSL CERTIFICATE CHECK
 then nikto -h 192.168.6.141
      nikto -host=http://www.megacorpone.com -maxtime=30s (Limits max time to scan to 30seconds)
 		- Nikto v2.1.6
