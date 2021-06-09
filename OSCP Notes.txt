@@ -2,7 +2,7 @@ PERSONAL OSCP NOTES ~Kunal Patel
 ==-==-==-==-==-==-==-==-==-==-==
 This notes consists of commands for tools and techniques i used to hack vulnerable machines from various platforms such as vulnhub, hackthebox, cyberseclabs, tryhackme, pwntilldawn, root-me, wizardlabs... while preparing for oscp.
 
-
+https://scund00r.com/all/oscp/2018/02/25/passing-oscp.html
 
 https://github.com/Elinpf/OSCP-survival-guide
 https://pentest.tonyng.net/timo-sablowskis-oscp-note/
