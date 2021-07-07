@@ -1569,6 +1569,11 @@ Windows privesc guide
 https://guif.re/windowseop
 
 
+Get windows version from one of this 2 files
+\windows\system32\license.rtf 
+\windows\system32\eula.txt
+
+
 -------------------------------
 (1: Windows-Exploit-Suggester)
 -------------------------------
