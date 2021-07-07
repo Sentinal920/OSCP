@@ -582,6 +582,9 @@ smtp-user-enum -M VRFY -U /root/sectools/SecLists/Usernames/Names/names.txt -t 1
 smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/Names/names.txt -t 10.200.200.188clear                                                        1 ⨯
 
 
+telnet 10.10.10.17 110
+retr 1
+retr 2
 
 ==============
  Kerberos (88)
