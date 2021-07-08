@@ -19,6 +19,8 @@ Some cool notes:
 https://github.com/areyou1or0/OSCP
 https://configurationsapien.com/category/pentester/
 
+https://github.com/snwlvl/FreeFloat-FTP-Server-Exploit/blob/master/exploit.py
+
 ====
 Nmap
 ====
