@@ -20,7 +20,7 @@ https://github.com/areyou1or0/OSCP
 https://configurationsapien.com/category/pentester/
 
 https://github.com/snwlvl/FreeFloat-FTP-Server-Exploit/blob/master/exploit.py
-
+https://github.com/SimodevStuff/Freefloat-FTP-Server-1.0---Remote-Buffer-Overflow/blob/master/exp.py
 ====
 Nmap
 ====
